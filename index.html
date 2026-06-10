@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description"
+        content="Soul Pathways — Reiki and Soul Healing in Amsterdam. Gentle, supportive energy healing sessions to help you reconnect, restore balance, and find calm." />
+    <title>Soul Pathways — Reiki &amp; Soul Healing in Amsterdam</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="static/icons/favicon.svg" />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Nunito+Sans:wght@300;400;600;700&display=swap"
+        rel="stylesheet" />
+
+    <!-- Leaflet (interactive map) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="anonymous" />
+
+    <!-- Site styles -->
+    <link rel="stylesheet" href="css/styles.css" />
+</head>
+
+<body>
+    <!-- ===================== NAVIGATION ===================== -->
+    <header class="site-header" id="top">
+        <nav class="nav container" aria-label="Primary">
+            <a href="#top" class="nav__brand">
+                <img src="static/logo/soul-pathways-logo.svg" alt="Soul Pathways logo" class="nav__logo" />
+                <span class="nav__name">Soul&nbsp;Pathways</span>
+            </a>
+
+            <button type="button" class="nav__toggle" id="navToggle" aria-label="Toggle navigation"
+                aria-expanded="false" aria-controls="navMenu">
+                <span class="nav__toggle-bar"></span>
+                <span class="nav__toggle-bar"></span>
+                <span class="nav__toggle-bar"></span>
+            </button>
+
+            <ul class="nav__menu" id="navMenu">
+                <li><a href="#about" class="nav__link">About</a></li>
+                <li><a href="#services" class="nav__link">Services</a></li>
+                <li><a href="#contact" class="nav__link">Contact</a></li>
+                <li><a href="#contact" class="nav__link nav__link--cta">Book a session</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <!-- ===================== HERO ===================== -->
+        <section class="hero" id="hero">
+            <div class="hero__overlay"></div>
+            <div class="hero__content container">
+                <p class="hero__eyebrow">Reiki &amp; Soul Healing · Amsterdam</p>
+                <h1 class="hero__title">Reconnect with your<br />inner calm</h1>
+                <p class="hero__subtitle">
+                    Gentle, supportive energy healing to help you release tension,
+                    restore balance, and feel grounded again.
+                </p>
+                <div class="hero__actions">
+                    <a href="#contact" class="btn btn--primary">Book a session</a>
+                    <a href="#about" class="btn btn--ghost">Learn more</a>
+                </div>
+            </div>
+            <a href="#about" class="hero__scroll" aria-label="Scroll to About section">
+                <span class="hero__scroll-dot"></span>
+            </a>
+        </section>
+
+        <!-- ===================== ABOUT ===================== -->
+        <section class="section about" id="about">
+            <div class="container about__grid">
+                <div class="about__media">
+                    <!-- Replace these placeholders with real photos in static/images/ -->
+                    <img src="static/images/about-1.svg" alt="Portrait of the practitioner — placeholder"
+                        class="about__photo about__photo--main" />
+                    <img src="static/images/about-2.svg" alt="Healing space — placeholder"
+                        class="about__photo about__photo--accent" />
+                </div>
+
+                <div class="about__text">
+                    <p class="section__eyebrow">About me</p>
+                    <h2 class="section__title">A warm, safe space to heal</h2>
+
+                    <!-- PLACEHOLDER COPY — replace with your own story and credentials -->
+                    <p>
+                        Hello, and welcome. I'm a Reiki practitioner and soul healing
+                        guide based in Amsterdam. <em>[This is placeholder text — share
+                        your personal story, training, and approach here.]</em>
+                    </p>
+                    <p>
+                        My work is rooted in compassion, presence, and deep respect for
+                        each person's journey. Whether you're navigating stress, seeking
+                        clarity, or simply longing for a moment of stillness, my sessions
+                        offer a calm space to reconnect with yourself.
+                        <em>[Add details about your philosophy and what clients can
+                        expect.]</em>
+                    </p>
+
+                    <ul class="about__highlights">
+                        <li>Certified Reiki practitioner <em>[edit]</em></li>
+                        <li>Years of practice <em>[edit]</em></li>
+                        <li>Individual &amp; tailored sessions</li>
+                    </ul>
+
+                    <a href="#contact" class="btn btn--primary">Get in touch</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===================== SERVICES ===================== -->
+        <section class="section services" id="services">
+            <div class="container">
+                <div class="section__head">
+                    <p class="section__eyebrow">What I offer</p>
+                    <h2 class="section__title">Services</h2>
+                    <p class="section__lead">
+                        Each session is gentle, intuitive, and tailored to where you
+                        are today. Below is a general overview — feel free to reach out
+                        with any questions.
+                    </p>
+                </div>
+
+                <div class="services__grid">
+                    <article class="card">
+                        <div class="card__icon" aria-hidden="true">✦</div>
+                        <h3 class="card__title">Reiki Healing</h3>
+                        <p class="card__text">
+                            A relaxing, hands-on (or hands-near) energy technique that
+                            encourages deep rest and supports your body's natural ability
+                            to find balance. Wonderful for stress relief and renewal.
+                        </p>
+                    </article>
+
+                    <article class="card">
+                        <div class="card__icon" aria-hidden="true">☾</div>
+                        <h3 class="card__title">Soul Healing</h3>
+                        <p class="card__text">
+                            A deeper, intuitive session to help release old patterns and
+                            reconnect with your inner self. We gently work with energy and
+                            intention to bring clarity, lightness, and grounding.
+                        </p>
+                    </article>
+
+                    <article class="card">
+                        <div class="card__icon" aria-hidden="true">❀</div>
+                        <h3 class="card__title">Combined Session</h3>
+                        <p class="card__text">
+                            A blended experience of Reiki and soul healing, shaped around
+                            your needs on the day. Ideal if you're not sure where to begin
+                            — we'll find the right rhythm together.
+                        </p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===================== CONTACT ===================== -->
+        <section class="section contact" id="contact">
+            <div class="container">
+                <div class="section__head">
+                    <p class="section__eyebrow">Get in touch</p>
+                    <h2 class="section__title">Contact &amp; Booking</h2>
+                    <p class="section__lead">
+                        Sessions are available at two welcoming locations in Amsterdam.
+                        Reach out to book, or use the weekly availability below as a guide.
+                    </p>
+                </div>
+
+                <div class="contact__grid">
+                    <!-- Contact details -->
+                    <div class="contact__details">
+                        <h3 class="contact__subtitle">Reach me directly</h3>
+                        <ul class="contact__list">
+                            <li>
+                                <span class="contact__label">Email</span>
+                                <!-- Replace with your real email -->
+                                <a href="mailto:hello@soulpathways.example">hello@soulpathways.example</a>
+                            </li>
+                            <li>
+                                <span class="contact__label">Phone</span>
+                                <!-- Replace with your real number -->
+                                <a href="tel:+310000000000">+31 (0)0 000 0000</a>
+                            </li>
+                            <li>
+                                <span class="contact__label">Instagram</span>
+                                <a href="#">@soulpathways <em>[edit]</em></a>
+                            </li>
+                        </ul>
+
+                        <h3 class="contact__subtitle">Locations</h3>
+                        <address class="contact__location">
+                            <strong>Common Ground</strong><br />
+                            Zeeburgerdijk 265<br />
+                            1095 AC Amsterdam
+                        </address>
+                        <address class="contact__location">
+                            <strong>The Integration Room</strong><br />
+                            <span class="contact__location-sub">Walk-In Therapy Studio Amsterdam</span><br />
+                            Eerste Laurierdwarsstraat 2<br />
+                            1016 PX Amsterdam
+                        </address>
+                    </div>
+
+                    <!-- Weekly schedule -->
+                    <div class="contact__schedule">
+                        <h3 class="contact__subtitle">Weekly availability <em>(template — edit)</em></h3>
+                        <table class="schedule">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Day</th>
+                                    <th scope="col">Hours</th>
+                                    <th scope="col">Location</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th scope="row">Monday</th>
+                                    <td>10:00 – 16:00</td>
+                                    <td>Common Ground</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Tuesday</th>
+                                    <td>12:00 – 18:00</td>
+                                    <td>The Integration Room</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Wednesday</th>
+                                    <td class="schedule__closed">By appointment</td>
+                                    <td>—</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Thursday</th>
+                                    <td>10:00 – 16:00</td>
+                                    <td>Common Ground</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Friday</th>
+                                    <td>12:00 – 18:00</td>
+                                    <td>The Integration Room</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Sat – Sun</th>
+                                    <td class="schedule__closed">Closed</td>
+                                    <td>—</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <p class="contact__note">
+                            <em>Times above are a placeholder template. Update them, or
+                            embed a booking tool (e.g. Calendly) here later.</em>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Interactive minimap -->
+                <div class="contact__map-wrap">
+                    <h3 class="contact__subtitle">Find me on the map</h3>
+                    <div id="map" class="contact__map" role="application"
+                        aria-label="Map showing the two Amsterdam session locations"></div>
+                    <p class="contact__map-legend">
+                        <span class="legend__pin legend__pin--green"></span> Common Ground
+                        <span class="legend__pin legend__pin--violet"></span> The Integration Room
+                    </p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ===================== FOOTER ===================== -->
+    <footer class="site-footer">
+        <div class="container site-footer__inner">
+            <div class="site-footer__brand">
+                <img src="static/logo/soul-pathways-logo.svg" alt="" class="site-footer__logo" />
+                <span>Soul Pathways</span>
+            </div>
+            <p class="site-footer__tag">Reiki &amp; Soul Healing · Amsterdam</p>
+            <p class="site-footer__copy">© <span id="year"></span> Soul Pathways. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous"></script>
+
+    <!-- Site scripts -->
+    <script src="js/main.js" defer></script>
+    <script src="js/map.js" defer></script>
+</body>
+
+</html>
+
