@@ -529,6 +529,35 @@ h3 {
     margin-top: 1em;
 }
 
+/* Online booking */
+.contact__booking {
+    margin-bottom: clamp(40px, 6vw, 64px);
+    text-align: center;
+}
+
+.contact__booking-lead {
+    max-width: 60ch;
+    margin: 0 auto 1.6em;
+    color: var(--c-ink-soft);
+}
+
+.booking__embed {
+    background: var(--c-white);
+    border: 1px solid var(--c-line);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    padding: 8px;
+}
+
+.booking__embed iframe {
+    display: block;
+    width: 100%;
+    min-height: 600px;
+    border: 0;
+    border-radius: calc(var(--radius-lg) - 8px);
+}
+
 /* Map */
 .contact__map-wrap {
     text-align: center;

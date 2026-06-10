@@ -67,8 +67,11 @@ Then visit <http://localhost:8000>.
 > sub-path. The `.nojekyll` file keeps GitHub Pages from interfering with the
 > folder structure.
 
-## Add online booking later (optional)
+## Online booking
 
-When you're ready, you can embed a scheduling tool (e.g. Calendly, TidyCal,
-or Google Appointment Schedule) inside the Contact section — no backend or
-database needed.
+The Contact section includes an embedded **Google Appointment Schedule** calendar
+(the `#booking` block in `index.html`). Visitors pick a slot and the appointment is
+confirmed instantly — no backend or database needed.
+
+To use a different calendar, replace the `<iframe src="...">` URL inside the
+`booking__embed` block with your own Google / Calendly / TidyCal embed link.
