@@ -1,0 +1,80 @@
+name: CI / CD
+
+# Test every push and pull request; deploy to GitHub Pages only from main.
+on:
+  push:
+    branches:
+      - "**"
+  pull_request:
+    branches:
+      - main
+
+# Least-privilege by default; the deploy job elevates what it needs.
+permissions:
+  contents: read
+
+# Cancel superseded runs on feature branches, but never interrupt a
+# deploy already in progress on main.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  # ------------------------------------------------------------------
+  # TEST — runs on all branches and PRs (validates the static site)
+  # ------------------------------------------------------------------
+  test:
+    name: Test (validate static site)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate HTML + asset links
+        run: npm test
+
+  # ------------------------------------------------------------------
+  # DEPLOY — only on push to main, and only after tests pass
+  # ------------------------------------------------------------------
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload site artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Publish the whole repo root (static site lives here).
+          path: "."
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+

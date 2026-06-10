@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600">
+  <defs>
+    <linearGradient id="g2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#9bb295"/>
+      <stop offset="100%" stop-color="#6f8d6a"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="600" fill="url(#g2)"/>
+  <!-- candle / zen stones motif -->
+  <ellipse cx="300" cy="430" rx="150" ry="30" fill="#41573e" opacity="0.45"/>
+  <ellipse cx="300" cy="400" rx="110" ry="34" fill="#e9e0cf"/>
+  <ellipse cx="300" cy="360" rx="80" ry="26" fill="#f2ead9"/>
+  <ellipse cx="300" cy="328" rx="54" ry="18" fill="#fbf6ec"/>
+  <circle cx="300" cy="250" r="20" fill="#f7efe0"/>
+  <text x="300" y="540" text-anchor="middle" font-family="Georgia, serif"
+        font-size="24" fill="#ffffff" fill-opacity="0.7" letter-spacing="3">SPACE · PLACEHOLDER</text>
+</svg>
+
