@@ -1,0 +1,25 @@
+{
+  "hero": {
+    "eyebrow": "Reiki & Soul Healing · Amsterdam",
+    "titleLine1": "Reconnect with your",
+    "titleLine2": "inner calm",
+    "subtitle": "Gentle, supportive energy healing to help you release tension, restore balance, and feel grounded again.",
+    "primaryCta": "Book a session",
+    "secondaryCta": "Learn more"
+  },
+  "about": {
+    "eyebrow": "About me",
+    "title": "A warm, safe space to heal",
+    "paragraphs": [
+      "Hello, and welcome. I'm a Reiki practitioner and soul healing guide based in Amsterdam. [This is placeholder text — share your personal story, training, and approach here.]",
+      "My work is rooted in compassion, presence, and deep respect for each person's journey. Whether you're navigating stress, seeking clarity, or simply longing for a moment of stillness, my sessions offer a calm space to reconnect with yourself. [Add details about your philosophy and what clients can expect.]"
+    ],
+    "highlights": [
+      "Certified Reiki practitioner [edit]",
+      "Years of practice [edit]",
+      "Individual & tailored sessions"
+    ],
+    "cta": "Get in touch"
+  }
+}
+

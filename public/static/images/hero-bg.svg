@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#a9c0a0"/>
+      <stop offset="55%" stop-color="#7d9b78"/>
+      <stop offset="100%" stop-color="#5f7e5b"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="72%" cy="28%" r="55%">
+      <stop offset="0%" stop-color="#f3ead7" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#f3ead7" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#sky)"/>
+  <rect width="1600" height="900" fill="url(#glow)"/>
+
+  <!-- soft rolling hills -->
+  <path d="M0 640 C 320 560 520 700 800 660 C 1080 620 1300 720 1600 650 L1600 900 L0 900 Z"
+        fill="#52704f" opacity="0.55"/>
+  <path d="M0 730 C 360 670 560 790 880 740 C 1180 695 1380 800 1600 740 L1600 900 L0 900 Z"
+        fill="#41573e" opacity="0.6"/>
+
+  <!-- sun / moon orb -->
+  <circle cx="1150" cy="250" r="120" fill="#f7efe0" opacity="0.9"/>
+  <circle cx="1150" cy="250" r="120" fill="none" stroke="#ffffff" stroke-opacity="0.25" stroke-width="2"/>
+
+  <text x="800" y="470" text-anchor="middle"
+        font-family="Georgia, serif" font-size="34" fill="#ffffff" fill-opacity="0.35"
+        letter-spacing="6">PLACEHOLDER · HERO BACKGROUND</text>
+</svg>
+

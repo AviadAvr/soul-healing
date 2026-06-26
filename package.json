@@ -2,14 +2,25 @@
   "name": "soul-pathways",
   "version": "1.0.0",
   "private": true,
-  "description": "Static website for Soul Pathways — Reiki & Soul Healing in Amsterdam.",
-  "type": "module",
+  "description": "Soul Pathways — Reiki & Soul Healing in Amsterdam (Next.js + TinaCMS).",
+  "engines": {
+    "node": ">=20 <23"
+  },
   "scripts": {
+    "dev": "tinacms dev -c \"next dev\"",
+    "build": "tinacms build && next build",
+    "start": "next start",
     "validate:html": "html-validate index.html",
-    "validate:assets": "node scripts/check-assets.mjs",
-    "test": "npm run validate:html && npm run validate:assets"
+    "validate:assets": "node scripts/check-assets.mjs"
+  },
+  "dependencies": {
+    "next": "^14.2.5",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tinacms": "^2.2.9"
   },
   "devDependencies": {
+    "@tinacms/cli": "^1.6.6",
     "html-validate": "^11.5.3"
   }
 }

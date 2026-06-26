@@ -9,3 +9,14 @@ npm-debug.log*
 .DS_Store
 Thumbs.db
 
+# Next.js
+.next/
+out/
+
+# TinaCMS generated files & admin build
+tina/__generated__/
+public/admin/
+
+# Local env
+.env
+
