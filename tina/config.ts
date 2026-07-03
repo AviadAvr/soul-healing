@@ -10,12 +10,7 @@ const branch =
 export default defineConfig({
   branch,
 
-  // ───────────────────────────────────────────────────────────────────
-  // Tina Cloud credentials.
-  // Leave these undefined to run in LOCAL MODE (no account needed) for the
-  // proof-of-concept. For production, create a project at app.tina.io and
-  // put the values in .env (see .env.example).
-  // ───────────────────────────────────────────────────────────────────
+  // Tina Cloud credentials (from .env). Leave undefined to run in local mode.
   clientId: process.env.NEXT_PUBLIC_TINA_CLIENT_ID,
   token: process.env.TINA_TOKEN,
 
@@ -23,9 +18,8 @@ export default defineConfig({
     outputFolder: "admin", // editor available at /admin
     publicFolder: "public",
     // GitHub Pages serves this project site under /soul-healing, so the admin
-    // SPA must load its assets from that sub-path. The production build script
-    // sets TINA_PUBLIC_BASE_PATH; local `tinacms dev` leaves it empty (root).
-    // Note: Tina expects the value WITHOUT a leading slash (e.g. "soul-healing").
+    // SPA must load its assets from there. Set by the production build script;
+    // local `tinacms dev` leaves it empty. No leading slash.
     basePath: (process.env.TINA_PUBLIC_BASE_PATH || "").replace(/^\/+/, ""),
   },
   media: {

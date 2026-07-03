@@ -1,77 +1,73 @@
 # Soul Pathways
 
-A simple, static website for **Soul Pathways** — Reiki &amp; Soul Healing in Amsterdam.
-Built with plain HTML, CSS and JavaScript so it can be hosted for free on **GitHub Pages**.
+Website for **Soul Pathways** — Reiki & Soul Healing in Amsterdam.
+Built with **Next.js** (static export) and **TinaCMS** for visual/inline content
+editing, hosted for free on **GitHub Pages**.
 
-## What's inside
+## Project layout
 
 ```
 soul-healing/
-├── index.html              # Single-page site (Hero, About, Services, Contact)
-├── .nojekyll               # Tells GitHub Pages to serve files as-is
-├── css/
-│   └── styles.css          # All styling (calming sage / sand palette)
-├── js/
-│   ├── main.js             # Mobile menu + footer year
-│   └── map.js              # Interactive map (Leaflet + OpenStreetMap)
-└── static/                 # ← your images & branding live here
-    ├── images/
-    │   ├── hero-bg.svg     # Hero background  (replace)
-    │   ├── about-1.svg     # About portrait   (replace)
-    │   └── about-2.svg     # About space photo(replace)
-    ├── logo/
-    │   └── soul-pathways-logo.svg
-    └── icons/
-        └── favicon.svg
+├── pages/
+│   ├── index.js           # The site (tabbed single page); Hero/About are Tina-editable
+│   └── _document.js        # Sets <html lang>
+├── content/pages/home.json # Editable content (committed to Git on save)
+├── tina/config.ts          # TinaCMS schema — the fields the client edits
+├── public/                 # Static assets served as-is (css/, js/, static/)
+├── scripts/
+│   ├── build.mjs           # Production build wrapper (see below)
+│   └── make-og-image.py    # Regenerates public/static/images/og-preview.jpg
+├── next.config.mjs         # Static export + /soul-healing basePath
+└── .github/workflows/deploy.yml  # Builds and deploys to GitHub Pages
 ```
 
-## Make it yours
+## Requirements
 
-Everything marked with `[edit]` or `placeholder` is meant to be replaced:
-
-- **About Me** — edit the text in the `#about` section of `index.html`.
-- **Photos** — drop real images into `static/images/` and update the `src`
-  attributes (you can keep the same filenames, or use `.jpg`/`.png`).
-- **Contact details** — update email, phone and Instagram in the `#contact` section.
-- **Schedule** — edit the table rows under "Weekly availability".
-- **Map** — coordinates for both locations live in `js/map.js`.
-
-The two booking locations are already set up:
-
-1. **Common Ground** — Zeeburgerdijk 265, 1095 AC Amsterdam
-2. **The Integration Room** — Eerste Laurierdwarsstraat 2, 1016 PX Amsterdam
-
-## Preview locally
-
-Open `index.html` directly in a browser, or run a tiny local server (recommended,
-so the map and fonts load exactly as they will online):
+**Node 20 or 22 (LTS).** Not Node 23/24 — TinaCMS pulls in `better-sqlite3`, a
+native module with no prebuilt binary for the newest Node versions. The repo
+pins Node via `.nvmrc`:
 
 ```powershell
-# from the project folder
-python -m http.server 8000
+nvm install 22
+nvm use 22
 ```
 
-Then visit <http://localhost:8000>.
+## Develop locally
 
-## Deploy to GitHub Pages
+```powershell
+npm install
+npm run dev
+```
 
-1. Commit and push everything to your GitHub repository.
-2. In the repo, go to **Settings → Pages**.
-3. Under **Build and deployment**, set **Source** to *Deploy from a branch*.
-4. Choose the `main` branch and the `/ (root)` folder, then **Save**.
-5. After a minute your site is live at
-   `https://<your-username>.github.io/soul-healing/`.
+- Site:   <http://localhost:3000>
+- Editor: <http://localhost:3000/admin/index.html>
 
-> Because this is a project site, all asset paths are **relative**
-> (`static/...`, `css/...`) so they work correctly under the `/soul-healing/`
-> sub-path. The `.nojekyll` file keeps GitHub Pages from interfering with the
-> folder structure.
+`npm run dev` runs Tina in **local mode**: edits in `/admin` are written straight
+to `content/pages/home.json` on disk — no account or token needed.
 
-## Online booking
+## Build
 
-The Contact section includes an embedded **Google Appointment Schedule** calendar
-(the `#booking` block in `index.html`). Visitors pick a slot and the appointment is
-confirmed instantly — no backend or database needed.
+```powershell
+npm run build   # -> static site in ./out
+```
 
-To use a different calendar, replace the `<iframe src="...">` URL inside the
-`booking__embed` block with your own Google / Calendly / TidyCal embed link.
+`scripts/build.mjs` runs `tinacms build` then `next build`, and works around a
+Windows-only file-copy race in Next's static export.
+
+## Deploy
+
+Pushing to `main` triggers `.github/workflows/deploy.yml`, which builds on Linux
+and publishes `./out` to GitHub Pages. Two one-time repo settings are required:
+
+1. **Settings → Pages → Source = GitHub Actions.**
+2. **Settings → Secrets and variables → Actions** — add `NEXT_PUBLIC_TINA_CLIENT_ID`
+   and `TINA_TOKEN` (from your Tina Cloud project).
+
+The live site is served under the `/soul-healing/` sub-path.
+
+## Editing content
+
+The client opens `/admin/index.html` on the deployed site, logs in via Tina
+Cloud, edits inline, and saves — Tina commits to `main`, which redeploys
+automatically. Only **Hero** and **About** are Tina-editable today; other
+sections are static markup in `pages/index.js` and can be migrated the same way.

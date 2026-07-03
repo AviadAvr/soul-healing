@@ -1,15 +1,14 @@
 """
 Generate the social share / link-preview image (1200x630) for Soul Pathways.
 Run:  python scripts/make-og-image.py
-Output: static/images/og-preview.jpg
-Uses the brand sage / sand palette from css/styles.css.
+Output: public/static/images/og-preview.jpg
 """
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 
 W, H = 1200, 630
 ROOT = Path(__file__).resolve().parent.parent
-OUT = ROOT / "static" / "images" / "og-preview.jpg"
+OUT = ROOT / "public" / "static" / "images" / "og-preview.jpg"
 
 # Brand palette
 C_BG = (250, 248, 244)      # --c-bg

@@ -10,9 +10,7 @@
     "dev": "tinacms dev -c \"next dev\"",
     "clean": "node -e \"require('fs').rmSync('out',{recursive:true,force:true});require('fs').rmSync('.next',{recursive:true,force:true})\"",
     "build": "node scripts/build.mjs",
-    "start": "next start",
-    "validate:html": "html-validate index.html",
-    "validate:assets": "node scripts/check-assets.mjs"
+    "start": "next start"
   },
   "dependencies": {
     "next": "^14.2.5",
@@ -21,8 +19,7 @@
     "tinacms": "^2.2.9"
   },
   "devDependencies": {
-    "@tinacms/cli": "^1.6.6",
-    "html-validate": "^11.5.3"
+    "@tinacms/cli": "^1.6.6"
   }
 }
 
