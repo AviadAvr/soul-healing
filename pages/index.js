@@ -9,7 +9,8 @@ import { client } from "../tina/__generated__/client";
 const PREFIX = process.env.NEXT_PUBLIC_BASE_PATH || "";
 
 // The single-page site is organised as tabs; only one panel is visible at a time.
-const TABS = ["home", "services", "about", "contact", "booking"];
+// "services" lives inside the Home panel.
+const TABS = ["home", "about", "contact", "booking"];
 
 export default function Home(props) {
   // useTina makes the content live-editable inside the Tina admin iframe.
@@ -154,7 +155,6 @@ export default function Home(props) {
 
           <ul className="nav__menu" id="navMenu" role="tablist" aria-label="Site sections">
             <li><a {...linkProps("home")} className={`nav__link${activeTab === "home" ? " is-active" : ""}`}>Home</a></li>
-            <li><a {...linkProps("services")} className={`nav__link${activeTab === "services" ? " is-active" : ""}`}>Services</a></li>
             <li><a {...linkProps("about")} className={`nav__link${activeTab === "about" ? " is-active" : ""}`}>About</a></li>
             <li><a {...linkProps("contact")} className={`nav__link${activeTab === "contact" ? " is-active" : ""}`}>Contact</a></li>
             <li><a {...linkProps("booking")} className={`nav__link nav__link--cta${activeTab === "booking" ? " is-active" : ""}`}>Book a session</a></li>
@@ -163,10 +163,11 @@ export default function Home(props) {
       </header>
 
       <main className="tabbed-main">
-        {/* ===================== HERO (Tina-editable) ===================== */}
-        <section {...panelProps("home", "hero")}>
-          <div className="hero__overlay"></div>
-          <div className="hero__content container">
+        {/* ===================== HOME: HERO + SERVICES (Tina-editable) ===================== */}
+        <div {...panelProps("home", "home-page")}>
+          <section className="hero">
+            <div className="hero__overlay"></div>
+            <div className="hero__content container">
             <p className="hero__eyebrow" data-tina-field={tinaField(hero, "eyebrow")}>
               {hero.eyebrow}
             </p>
@@ -187,7 +188,33 @@ export default function Home(props) {
               </a>
             </div>
           </div>
-        </section>
+          </section>
+
+          {/* ===================== SERVICES (part of Home, Tina-editable) ===================== */}
+          <section className="section services">
+            <div className="container">
+              <div className="section__head">
+                <p className="section__eyebrow" data-tina-field={tinaField(services, "eyebrow")}>{services.eyebrow}</p>
+                <h2 className="section__title" data-tina-field={tinaField(services, "title")}>{services.title}</h2>
+                <p className="section__lead" data-tina-field={tinaField(services, "lead")}>
+                  {services.lead}
+                </p>
+              </div>
+
+              <div className="services__grid">
+                {services.cards?.map((card, i) => (
+                  <article className="card" key={i} data-tina-field={tinaField(card)}>
+                    <div className="card__icon" aria-hidden="true" data-tina-field={tinaField(card, "icon")}>{card.icon}</div>
+                    <h3 className="card__title" data-tina-field={tinaField(card, "title")}>{card.title}</h3>
+                    <p className="card__text" data-tina-field={tinaField(card, "text")}>
+                      {card.text}
+                    </p>
+                  </article>
+                ))}
+              </div>
+            </div>
+          </section>
+        </div>
 
         {/* ===================== ABOUT (Tina-editable) ===================== */}
         <section {...panelProps("about", "section about")}>
@@ -220,31 +247,6 @@ export default function Home(props) {
               <a href="#contact" className="btn btn--primary" data-tab="contact" onClick={(e) => { e.preventDefault(); selectTab("contact"); }} data-tina-field={tinaField(about, "cta")}>
                 {about.cta}
               </a>
-            </div>
-          </div>
-        </section>
-
-        {/* ===================== SERVICES (Tina-editable) ===================== */}
-        <section {...panelProps("services", "section services")}>
-          <div className="container">
-            <div className="section__head">
-              <p className="section__eyebrow" data-tina-field={tinaField(services, "eyebrow")}>{services.eyebrow}</p>
-              <h2 className="section__title" data-tina-field={tinaField(services, "title")}>{services.title}</h2>
-              <p className="section__lead" data-tina-field={tinaField(services, "lead")}>
-                {services.lead}
-              </p>
-            </div>
-
-            <div className="services__grid">
-              {services.cards?.map((card, i) => (
-                <article className="card" key={i} data-tina-field={tinaField(card)}>
-                  <div className="card__icon" aria-hidden="true" data-tina-field={tinaField(card, "icon")}>{card.icon}</div>
-                  <h3 className="card__title" data-tina-field={tinaField(card, "title")}>{card.title}</h3>
-                  <p className="card__text" data-tina-field={tinaField(card, "text")}>
-                    {card.text}
-                  </p>
-                </article>
-              ))}
             </div>
           </div>
         </section>
