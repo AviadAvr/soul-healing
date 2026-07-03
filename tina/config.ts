@@ -85,6 +85,113 @@ export default defineConfig({
               { type: "string", name: "cta", label: "Button label" },
             ],
           },
+          // ───────────── SERVICES ─────────────
+          {
+            type: "object",
+            name: "services",
+            label: "Services",
+            fields: [
+              { type: "string", name: "eyebrow", label: "Eyebrow" },
+              { type: "string", name: "title", label: "Heading" },
+              {
+                type: "string",
+                name: "lead",
+                label: "Intro",
+                ui: { component: "textarea" },
+              },
+              {
+                type: "object",
+                name: "cards",
+                label: "Service cards",
+                list: true,
+                ui: { itemProps: (item) => ({ label: item?.title }) },
+                fields: [
+                  { type: "string", name: "icon", label: "Icon (symbol)" },
+                  { type: "string", name: "title", label: "Title" },
+                  {
+                    type: "string",
+                    name: "text",
+                    label: "Description",
+                    ui: { component: "textarea" },
+                  },
+                ],
+              },
+            ],
+          },
+          // ───────────── CONTACT ─────────────
+          {
+            type: "object",
+            name: "contact",
+            label: "Contact",
+            fields: [
+              { type: "string", name: "eyebrow", label: "Eyebrow" },
+              { type: "string", name: "title", label: "Heading" },
+              {
+                type: "string",
+                name: "lead",
+                label: "Intro",
+                ui: { component: "textarea" },
+              },
+              { type: "string", name: "detailsTitle", label: "“Reach me” heading" },
+              { type: "string", name: "email", label: "Email" },
+              { type: "string", name: "phone", label: "Phone" },
+              { type: "string", name: "instagram", label: "Instagram handle" },
+              { type: "string", name: "locationsTitle", label: "Locations heading" },
+              {
+                type: "object",
+                name: "locations",
+                label: "Locations",
+                list: true,
+                ui: { itemProps: (item) => ({ label: item?.name }) },
+                fields: [
+                  { type: "string", name: "name", label: "Name" },
+                  {
+                    type: "string",
+                    name: "addressLines",
+                    label: "Address lines",
+                    list: true,
+                  },
+                ],
+              },
+              { type: "string", name: "scheduleTitle", label: "Schedule heading" },
+              {
+                type: "object",
+                name: "schedule",
+                label: "Weekly availability",
+                list: true,
+                ui: { itemProps: (item) => ({ label: item?.day }) },
+                fields: [
+                  { type: "string", name: "day", label: "Day" },
+                  { type: "string", name: "hours", label: "Hours" },
+                  { type: "string", name: "location", label: "Location" },
+                ],
+              },
+              {
+                type: "string",
+                name: "scheduleNote",
+                label: "Schedule note",
+                ui: { component: "textarea" },
+              },
+              { type: "string", name: "mapTitle", label: "Map heading" },
+            ],
+          },
+          // ───────────── BOOKING ─────────────
+          {
+            type: "object",
+            name: "booking",
+            label: "Booking",
+            fields: [
+              { type: "string", name: "eyebrow", label: "Eyebrow" },
+              { type: "string", name: "title", label: "Heading" },
+              {
+                type: "string",
+                name: "lead",
+                label: "Intro",
+                ui: { component: "textarea" },
+              },
+              { type: "string", name: "calendlyUrl", label: "Calendly URL" },
+            ],
+          },
         ],
       },
     ],

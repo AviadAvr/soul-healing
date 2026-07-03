@@ -21,6 +21,9 @@ export default function Home(props) {
 
   const hero = data.page.hero;
   const about = data.page.about;
+  const services = data.page.services;
+  const contact = data.page.contact;
+  const booking = data.page.booking;
 
   // ── Tab navigation ────────────────────────────────────────────────
   // Default to "home" so the server-rendered HTML matches (good for SEO and
@@ -221,99 +224,73 @@ export default function Home(props) {
           </div>
         </section>
 
-        {/* ===================== SERVICES (static for now) ===================== */}
+        {/* ===================== SERVICES (Tina-editable) ===================== */}
         <section {...panelProps("services", "section services")}>
           <div className="container">
             <div className="section__head">
-              <p className="section__eyebrow">What I offer</p>
-              <h2 className="section__title">Services</h2>
-              <p className="section__lead">
-                Each session is gentle, intuitive, and tailored to where you
-                are today. Below is a general overview — feel free to reach out
-                with any questions.
+              <p className="section__eyebrow" data-tina-field={tinaField(services, "eyebrow")}>{services.eyebrow}</p>
+              <h2 className="section__title" data-tina-field={tinaField(services, "title")}>{services.title}</h2>
+              <p className="section__lead" data-tina-field={tinaField(services, "lead")}>
+                {services.lead}
               </p>
             </div>
 
             <div className="services__grid">
-              <article className="card">
-                <div className="card__icon" aria-hidden="true">✦</div>
-                <h3 className="card__title">Reiki Healing</h3>
-                <p className="card__text">
-                  A relaxing, hands-on (or hands-near) energy technique that
-                  encourages deep rest and supports your body's natural ability
-                  to find balance. Wonderful for stress relief and renewal.
-                </p>
-              </article>
-
-              <article className="card">
-                <div className="card__icon" aria-hidden="true">☾</div>
-                <h3 className="card__title">Soul Healing</h3>
-                <p className="card__text">
-                  A deeper, intuitive session to help release old patterns and
-                  reconnect with your inner self. We gently work with energy and
-                  intention to bring clarity, lightness, and grounding.
-                </p>
-              </article>
-
-              <article className="card">
-                <div className="card__icon" aria-hidden="true">❀</div>
-                <h3 className="card__title">Combined Session</h3>
-                <p className="card__text">
-                  A blended experience of Reiki and soul healing, shaped around
-                  your needs on the day. Ideal if you're not sure where to begin
-                  — we'll find the right rhythm together.
-                </p>
-              </article>
+              {services.cards?.map((card, i) => (
+                <article className="card" key={i} data-tina-field={tinaField(card)}>
+                  <div className="card__icon" aria-hidden="true" data-tina-field={tinaField(card, "icon")}>{card.icon}</div>
+                  <h3 className="card__title" data-tina-field={tinaField(card, "title")}>{card.title}</h3>
+                  <p className="card__text" data-tina-field={tinaField(card, "text")}>
+                    {card.text}
+                  </p>
+                </article>
+              ))}
             </div>
           </div>
         </section>
 
-        {/* ===================== CONTACT (static for now) ===================== */}
+        {/* ===================== CONTACT (Tina-editable) ===================== */}
         <section {...panelProps("contact", "section contact")}>
           <div className="container">
             <div className="section__head">
-              <p className="section__eyebrow">Get in touch</p>
-              <h2 className="section__title">Contact &amp; Booking</h2>
-              <p className="section__lead">
-                Sessions are available at two welcoming locations in Amsterdam.
-                Reach out to book, or use the weekly availability below as a guide.
+              <p className="section__eyebrow" data-tina-field={tinaField(contact, "eyebrow")}>{contact.eyebrow}</p>
+              <h2 className="section__title" data-tina-field={tinaField(contact, "title")}>{contact.title}</h2>
+              <p className="section__lead" data-tina-field={tinaField(contact, "lead")}>
+                {contact.lead}
               </p>
             </div>
 
             <div className="contact__grid">
               <div className="contact__details">
-                <h3 className="contact__subtitle">Reach me directly</h3>
+                <h3 className="contact__subtitle" data-tina-field={tinaField(contact, "detailsTitle")}>{contact.detailsTitle}</h3>
                 <ul className="contact__list">
                   <li>
                     <span className="contact__label">Email</span>
-                    <a href="mailto:hello@soulpathways.example">hello@soulpathways.example</a>
+                    <a href={`mailto:${contact.email}`} data-tina-field={tinaField(contact, "email")}>{contact.email}</a>
                   </li>
                   <li>
                     <span className="contact__label">Phone</span>
-                    <a href="tel:+310000000000">+31 (0)0 000 0000</a>
+                    <a href={`tel:${(contact.phone || "").replace(/[^+\d]/g, "")}`} data-tina-field={tinaField(contact, "phone")}>{contact.phone}</a>
                   </li>
                   <li>
                     <span className="contact__label">Instagram</span>
-                    <a href="#">@soulpathways <em>[edit]</em></a>
+                    <a href="#" data-tina-field={tinaField(contact, "instagram")}>{contact.instagram}</a>
                   </li>
                 </ul>
 
-                <h3 className="contact__subtitle">Locations</h3>
-                <address className="contact__location">
-                  <strong>Common Ground</strong><br />
-                  Zeeburgerdijk 265<br />
-                  1095 AC Amsterdam
-                </address>
-                <address className="contact__location">
-                  <strong>The Integration Room</strong><br />
-                  <span className="contact__location-sub">Walk-In Therapy Studio Amsterdam</span><br />
-                  Eerste Laurierdwarsstraat 2<br />
-                  1016 PX Amsterdam
-                </address>
+                <h3 className="contact__subtitle" data-tina-field={tinaField(contact, "locationsTitle")}>{contact.locationsTitle}</h3>
+                {contact.locations?.map((loc, i) => (
+                  <address className="contact__location" key={i} data-tina-field={tinaField(loc)}>
+                    <strong>{loc.name}</strong><br />
+                    {loc.addressLines?.map((line, j) => (
+                      <span key={j}>{line}<br /></span>
+                    ))}
+                  </address>
+                ))}
               </div>
 
               <div className="contact__schedule">
-                <h3 className="contact__subtitle">Weekly availability <em>(template — edit)</em></h3>
+                <h3 className="contact__subtitle" data-tina-field={tinaField(contact, "scheduleTitle")}>{contact.scheduleTitle}</h3>
                 <table className="schedule">
                   <thead>
                     <tr>
@@ -323,47 +300,50 @@ export default function Home(props) {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr><th scope="row">Monday</th><td>10:00 – 16:00</td><td>Common Ground</td></tr>
-                    <tr><th scope="row">Tuesday</th><td>12:00 – 18:00</td><td>The Integration Room</td></tr>
-                    <tr><th scope="row">Wednesday</th><td className="schedule__closed">By appointment</td><td>—</td></tr>
-                    <tr><th scope="row">Thursday</th><td>10:00 – 16:00</td><td>Common Ground</td></tr>
-                    <tr><th scope="row">Friday</th><td>12:00 – 18:00</td><td>The Integration Room</td></tr>
-                    <tr><th scope="row">Sat – Sun</th><td className="schedule__closed">Closed</td><td>—</td></tr>
+                    {contact.schedule?.map((row, i) => {
+                      const closed = /closed|appointment/i.test(row.hours || "");
+                      return (
+                        <tr key={i} data-tina-field={tinaField(row)}>
+                          <th scope="row">{row.day}</th>
+                          <td className={closed ? "schedule__closed" : undefined}>{row.hours}</td>
+                          <td>{row.location}</td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
-                <p className="contact__note">
-                  <em>Times above are a general guide. To reserve your spot,
-                  use the online booking calendar below.</em>
+                <p className="contact__note" data-tina-field={tinaField(contact, "scheduleNote")}>
+                  <em>{contact.scheduleNote}</em>
                 </p>
               </div>
             </div>
 
             <div className="contact__map-wrap">
-              <h3 className="contact__subtitle">Find me on the map</h3>
+              <h3 className="contact__subtitle" data-tina-field={tinaField(contact, "mapTitle")}>{contact.mapTitle}</h3>
               <div id="map" className="contact__map" role="application" aria-label="Map showing the two Amsterdam session locations"></div>
               <p className="contact__map-legend">
-                <span className="legend__pin legend__pin--green"></span> Common Ground
-                <span className="legend__pin legend__pin--violet"></span> The Integration Room
+                <span className="legend__pin legend__pin--green"></span> {contact.locations?.[0]?.name}
+                <span className="legend__pin legend__pin--violet"></span> {contact.locations?.[1]?.name}
               </p>
             </div>
           </div>
         </section>
 
-        {/* ===================== BOOKING (static for now) ===================== */}
+        {/* ===================== BOOKING (Tina-editable) ===================== */}
         <section {...panelProps("booking", "section booking")}>
           <div className="container">
             <div className="section__head">
-              <p className="section__eyebrow">Appointments</p>
-              <h2 className="section__title">Book a session online</h2>
-              <p className="section__lead">
-                Choose a time that suits you below. Sessions are available in
-                Common Ground and The Integration Room.
+              <p className="section__eyebrow" data-tina-field={tinaField(booking, "eyebrow")}>{booking.eyebrow}</p>
+              <h2 className="section__title" data-tina-field={tinaField(booking, "title")}>{booking.title}</h2>
+              <p className="section__lead" data-tina-field={tinaField(booking, "lead")}>
+                {booking.lead}
               </p>
             </div>
             <div className="booking__embed">
               <div
                 className="calendly-inline-widget"
-                data-url="https://calendly.com/babagas_a/30min?background_color=c3e9c1&primary_color=67a765"
+                data-url={booking.calendlyUrl}
+                data-tina-field={tinaField(booking, "calendlyUrl")}
               ></div>
               <Script src="https://assets.calendly.com/assets/external/widget.js" strategy="afterInteractive" />
             </div>
