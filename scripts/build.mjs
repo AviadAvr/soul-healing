@@ -22,6 +22,13 @@ const clean = () => {
   rmSync(".next", { recursive: true, force: true });
 };
 
+// This is a production build for the GitHub Pages project site, served under
+// /soul-healing. Tell TinaCMS's admin SPA to load its assets from that path.
+// (tinacms build runs before next build, so NODE_ENV isn't "production" yet —
+// an explicit env var is the reliable signal. Local dev uses `tinacms dev`,
+// which never runs this script, so its basePath stays empty/root.)
+process.env.TINA_PUBLIC_BASE_PATH = "soul-healing";
+
 // Safety: if a previous crashed run left public/ hidden, restore it first.
 if (!existsSync(PUBLIC) && existsSync(HIDDEN)) {
   renameSync(HIDDEN, PUBLIC);
@@ -49,4 +56,5 @@ try {
 cpSync(PUBLIC, "out", { recursive: true, force: true });
 
 console.log("\n✅ Build succeeded (public/ copied sequentially).");
+
 

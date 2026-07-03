@@ -22,6 +22,11 @@ export default defineConfig({
   build: {
     outputFolder: "admin", // editor available at /admin
     publicFolder: "public",
+    // GitHub Pages serves this project site under /soul-healing, so the admin
+    // SPA must load its assets from that sub-path. The production build script
+    // sets TINA_PUBLIC_BASE_PATH; local `tinacms dev` leaves it empty (root).
+    // Note: Tina expects the value WITHOUT a leading slash (e.g. "soul-healing").
+    basePath: (process.env.TINA_PUBLIC_BASE_PATH || "").replace(/^\/+/, ""),
   },
   media: {
     tina: {
