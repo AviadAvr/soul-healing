@@ -20,3 +20,12 @@ public/admin/
 # Local env
 .env
 
+
+# IDE
+.idea/
+
+# Local debug / scratch artifacts
+*.status
+b4sum.txt
+build2sum.txt
+ntest1err.txt
