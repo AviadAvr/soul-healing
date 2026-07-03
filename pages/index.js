@@ -1,11 +1,15 @@
 import Head from "next/head";
 import Script from "next/script";
+import { useEffect, useState } from "react";
 import { useTina, tinaField } from "tinacms/dist/react";
 import { client } from "../tina/__generated__/client";
 
 // Plain <img>/<link>/<script> srcs are NOT auto-prefixed with basePath the way
 // next/link and next/image are, so we prefix them manually for GitHub Pages.
 const PREFIX = process.env.NEXT_PUBLIC_BASE_PATH || "";
+
+// The single-page site is organised as tabs; only one panel is visible at a time.
+const TABS = ["home", "services", "about", "contact", "booking"];
 
 export default function Home(props) {
   // useTina makes the content live-editable inside the Tina admin iframe.
@@ -17,6 +21,56 @@ export default function Home(props) {
 
   const hero = data.page.hero;
   const about = data.page.about;
+
+  // ── Tab navigation ────────────────────────────────────────────────
+  // Default to "home" so the server-rendered HTML matches (good for SEO and
+  // first paint); on the client we sync to the URL hash after hydration.
+  const [activeTab, setActiveTab] = useState("home");
+
+  useEffect(() => {
+    const applyFromHash = () => {
+      const id = window.location.hash.replace(/^#/, "");
+      if (TABS.includes(id)) setActiveTab(id);
+    };
+    applyFromHash(); // handle deep links like /#about on load
+    window.addEventListener("hashchange", applyFromHash); // back/forward + #links
+    return () => window.removeEventListener("hashchange", applyFromHash);
+  }, []);
+
+  const selectTab = (id) => {
+    setActiveTab(id);
+    if (typeof window !== "undefined") {
+      // Update the URL without triggering the default jump/scroll.
+      window.history.replaceState(null, "", `#${id}`);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      // Close the mobile nav menu if it's open.
+      document.getElementById("navMenu")?.classList.remove("is-open");
+      document.getElementById("navToggle")?.setAttribute("aria-expanded", "false");
+    }
+  };
+
+  // Props for a tab link (nav) and a tab panel (section), derived from state.
+  const linkProps = (id) => ({
+    href: `#${id}`,
+    id: `tab-${id}-link`,
+    role: "tab",
+    "aria-selected": activeTab === id,
+    "aria-controls": `tab-${id}`,
+    "data-tab": id,
+    onClick: (e) => {
+      e.preventDefault();
+      selectTab(id);
+    },
+  });
+
+  const panelProps = (id, baseClass) => ({
+    id: `tab-${id}`,
+    "data-tab-panel": id,
+    role: "tabpanel",
+    "aria-labelledby": `tab-${id}-link`,
+    className: `${baseClass} tab-panel${activeTab === id ? " is-active" : ""}`,
+    hidden: activeTab !== id,
+  });
 
   return (
     <>
@@ -96,18 +150,18 @@ export default function Home(props) {
           </button>
 
           <ul className="nav__menu" id="navMenu" role="tablist" aria-label="Site sections">
-            <li><a href="#home" className="nav__link is-active" id="tab-home-link" role="tab" aria-selected="true" aria-controls="tab-home" data-tab="home">Home</a></li>
-            <li><a href="#services" className="nav__link" id="tab-services-link" role="tab" aria-selected="false" aria-controls="tab-services" data-tab="services">Services</a></li>
-            <li><a href="#about" className="nav__link" id="tab-about-link" role="tab" aria-selected="false" aria-controls="tab-about" data-tab="about">About</a></li>
-            <li><a href="#contact" className="nav__link" id="tab-contact-link" role="tab" aria-selected="false" aria-controls="tab-contact" data-tab="contact">Contact</a></li>
-            <li><a href="#booking" className="nav__link nav__link--cta" id="tab-booking-link" role="tab" aria-selected="false" aria-controls="tab-booking" data-tab="booking">Book a session</a></li>
+            <li><a {...linkProps("home")} className={`nav__link${activeTab === "home" ? " is-active" : ""}`}>Home</a></li>
+            <li><a {...linkProps("services")} className={`nav__link${activeTab === "services" ? " is-active" : ""}`}>Services</a></li>
+            <li><a {...linkProps("about")} className={`nav__link${activeTab === "about" ? " is-active" : ""}`}>About</a></li>
+            <li><a {...linkProps("contact")} className={`nav__link${activeTab === "contact" ? " is-active" : ""}`}>Contact</a></li>
+            <li><a {...linkProps("booking")} className={`nav__link nav__link--cta${activeTab === "booking" ? " is-active" : ""}`}>Book a session</a></li>
           </ul>
         </nav>
       </header>
 
       <main className="tabbed-main">
         {/* ===================== HERO (Tina-editable) ===================== */}
-        <section className="hero tab-panel is-active" id="tab-home" data-tab-panel="home" role="tabpanel" aria-labelledby="tab-home-link">
+        <section {...panelProps("home", "hero")}>
           <div className="hero__overlay"></div>
           <div className="hero__content container">
             <p className="hero__eyebrow" data-tina-field={tinaField(hero, "eyebrow")}>
@@ -122,10 +176,10 @@ export default function Home(props) {
               {hero.subtitle}
             </p>
             <div className="hero__actions">
-              <a href="#booking" className="btn btn--primary" data-tab="booking" data-tina-field={tinaField(hero, "primaryCta")}>
+              <a href="#booking" className="btn btn--primary" data-tab="booking" onClick={(e) => { e.preventDefault(); selectTab("booking"); }} data-tina-field={tinaField(hero, "primaryCta")}>
                 {hero.primaryCta}
               </a>
-              <a href="#about" className="btn btn--ghost" data-tab="about" data-tina-field={tinaField(hero, "secondaryCta")}>
+              <a href="#about" className="btn btn--ghost" data-tab="about" onClick={(e) => { e.preventDefault(); selectTab("about"); }} data-tina-field={tinaField(hero, "secondaryCta")}>
                 {hero.secondaryCta}
               </a>
             </div>
@@ -133,7 +187,7 @@ export default function Home(props) {
         </section>
 
         {/* ===================== ABOUT (Tina-editable) ===================== */}
-        <section className="section about tab-panel" id="tab-about" data-tab-panel="about" role="tabpanel" aria-labelledby="tab-about-link" hidden>
+        <section {...panelProps("about", "section about")}>
           <div className="container about__grid">
             <div className="about__media">
               <img src={`${PREFIX}/static/images/about-1.jpg`} alt="Portrait of the practitioner — placeholder" className="about__photo about__photo--main" />
@@ -160,7 +214,7 @@ export default function Home(props) {
                 ))}
               </ul>
 
-              <a href="#contact" className="btn btn--primary" data-tab="contact" data-tina-field={tinaField(about, "cta")}>
+              <a href="#contact" className="btn btn--primary" data-tab="contact" onClick={(e) => { e.preventDefault(); selectTab("contact"); }} data-tina-field={tinaField(about, "cta")}>
                 {about.cta}
               </a>
             </div>
@@ -168,7 +222,7 @@ export default function Home(props) {
         </section>
 
         {/* ===================== SERVICES (static for now) ===================== */}
-        <section className="section services tab-panel" id="tab-services" data-tab-panel="services" role="tabpanel" aria-labelledby="tab-services-link" hidden>
+        <section {...panelProps("services", "section services")}>
           <div className="container">
             <div className="section__head">
               <p className="section__eyebrow">What I offer</p>
@@ -215,7 +269,7 @@ export default function Home(props) {
         </section>
 
         {/* ===================== CONTACT (static for now) ===================== */}
-        <section className="section contact tab-panel" id="tab-contact" data-tab-panel="contact" role="tabpanel" aria-labelledby="tab-contact-link" hidden>
+        <section {...panelProps("contact", "section contact")}>
           <div className="container">
             <div className="section__head">
               <p className="section__eyebrow">Get in touch</p>
@@ -296,7 +350,7 @@ export default function Home(props) {
         </section>
 
         {/* ===================== BOOKING (static for now) ===================== */}
-        <section className="section booking tab-panel" id="tab-booking" data-tab-panel="booking" role="tabpanel" aria-labelledby="tab-booking-link" hidden>
+        <section {...panelProps("booking", "section booking")}>
           <div className="container">
             <div className="section__head">
               <p className="section__eyebrow">Appointments</p>
@@ -359,4 +413,13 @@ export const getStaticProps = async () => {
     },
   };
 };
+
+
+
+
+
+
+
+
+
 
