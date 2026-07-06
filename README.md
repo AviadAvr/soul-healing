@@ -16,7 +16,14 @@ soul-healing/
 ├── public/                 # Static assets served as-is (css/, js/, static/)
 ├── scripts/
 │   ├── build.mjs           # Production build wrapper (see below)
-│   └── make-og-image.py    # Regenerates public/static/images/og-preview.jpg
+│   ├── images/
+│   │   ├── brand.py            # Shared brand palette + SVG writer for the generators
+│   │   ├── make-assets.py      # Regenerates every generated image at once
+│   │   ├── make-favicon.py     # -> public/static/icons/favicon.svg
+│   │   ├── make-logo.py        # -> public/static/logo/soul-pathways-logo.svg
+│   │   ├── make-hero-bg.py     # -> public/static/images/hero-bg.svg
+│   │   ├── make-about-2.py     # -> public/static/images/about-2.svg
+│   │   └── make-og-image.py    # -> public/static/images/og-preview.jpg
 ├── next.config.mjs         # Static export + /soul-healing basePath
 └── .github/workflows/deploy.yml  # Builds and deploys to GitHub Pages
 ```
@@ -53,6 +60,26 @@ npm run build   # -> static site in ./out
 
 `scripts/build.mjs` runs `tinacms build` then `next build`, and works around a
 Windows-only file-copy race in Next's static export.
+
+## Brand assets (generated images)
+
+All the brand images are produced by scripts so they stay reproducible and easy
+to tweak. Colors live once in `scripts/brand.py` (mirroring the `--c-*` CSS
+variables). Requires Python with **Pillow** for the OG image
+(`pip install pillow`); the SVG scripts need only the standard library.
+
+```powershell
+python scripts/make-assets.py        # regenerate everything
+python scripts/make-logo.py          # or just one asset
+```
+
+| Script              | Output                                       |
+| ------------------- | -------------------------------------------- |
+| `make-favicon.py`   | `public/static/icons/favicon.svg`            |
+| `make-logo.py`      | `public/static/logo/soul-pathways-logo.svg`  |
+| `make-hero-bg.py`   | `public/static/images/hero-bg.svg`           |
+| `make-about-2.py`   | `public/static/images/about-2.svg`           |
+| `make-og-image.py`  | `public/static/images/og-preview.jpg`        |
 
 ## Deploy
 

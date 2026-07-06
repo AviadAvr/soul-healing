@@ -1,6 +1,14 @@
+"""
+Generate the Soul Pathways logo mark (64x64): a lotus-like bloom over a path.
+Run:  python scripts/make-logo.py
+Output: public/static/logo/soul-pathways-logo.svg
+"""
+import brand as b
+
+svg = f"""
 <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
   <!-- Soul Pathways mark: a lotus-like bloom over a gentle path -->
-  <g fill="none" stroke="#5f7e5b" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+  <g fill="none" stroke="{b.SAGE_DARK}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
     <!-- centre petal -->
     <path d="M32 12 C 27 22 27 30 32 38 C 37 30 37 22 32 12 Z"/>
     <!-- side petals -->
@@ -11,6 +19,10 @@
     <path d="M32 39 C 42 39 50 35 55 28 C 46 25 37 30 32 39 Z"/>
   </g>
   <!-- winding path -->
-  <path d="M20 52 C 28 46 36 58 44 50" fill="none" stroke="#d8a766" stroke-width="2.6"
+  <path d="M20 52 C 28 46 36 58 44 50" fill="none" stroke="{b.GOLD}" stroke-width="2.6"
         stroke-linecap="round"/>
 </svg>
+"""
+
+b.write_svg("public/static/logo/soul-pathways-logo.svg", svg)
+
