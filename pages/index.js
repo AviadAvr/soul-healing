@@ -100,7 +100,7 @@ export default function Home(props) {
         />
         <meta
           property="og:image"
-          content="https://soul-pathways.github.io/soul-healing/static/images/og-preview.jpg"
+          content="https://aviadavr.github.io/soul-healing/static/images/og-preview.jpg"
         />
         <meta name="twitter:card" content="summary_large_image" />
 
