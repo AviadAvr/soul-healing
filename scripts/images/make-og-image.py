@@ -108,6 +108,6 @@ draw.text((170, 505), "Gentle energy healing to restore balance & find peace",
 draw.ellipse([170, 70, 210, 110], outline=WHITE, width=3)
 draw.text((228, 73), "Soul Pathways", font=f_brand, fill=WHITE)
 
-img.save(OUT, "JPEG", quality=88, optimize=True)
+img.save(OUT, "JPEG", quality=82, optimize=True, progressive=False)
 print(f"Wrote {OUT} ({img.size[0]}x{img.size[1]})")
 

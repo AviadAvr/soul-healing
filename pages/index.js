@@ -102,7 +102,23 @@ export default function Home(props) {
           property="og:image"
           content="https://aviadavr.github.io/soul-healing/static/images/og-preview.jpg"
         />
+        <meta
+          property="og:image:secure_url"
+          content="https://aviadavr.github.io/soul-healing/static/images/og-preview.jpg"
+        />
+        <meta property="og:image:type" content="image/jpeg" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta
+          property="og:image:alt"
+          content="Soul Pathways — Reiki & Soul Healing in Amsterdam"
+        />
+        <meta property="og:url" content="https://aviadavr.github.io/soul-healing/" />
         <meta name="twitter:card" content="summary_large_image" />
+        <meta
+          name="twitter:image"
+          content="https://aviadavr.github.io/soul-healing/static/images/og-preview.jpg"
+        />
 
         <meta name="theme-color" content="#7d9b78" />
         <link rel="icon" type="image/svg+xml" href={`${PREFIX}/static/icons/favicon.svg`} />
