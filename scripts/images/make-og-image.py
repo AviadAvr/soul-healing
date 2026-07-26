@@ -7,7 +7,7 @@ from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 
 W, H = 1200, 630
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parent.parent.parent
 OUT = ROOT / "public" / "static" / "images" / "og-preview.jpg"
 
 # Brand palette
