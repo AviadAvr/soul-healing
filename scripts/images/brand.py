@@ -7,7 +7,8 @@ lighter/darker shades used only inside the illustrations.
 """
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+# This module lives in scripts/images/, so the repo root is three levels up.
+ROOT = Path(__file__).resolve().parent.parent.parent
 
 # --- Core palette (matches --c-* in public/css/styles.css) -----------------
 BG = "#faf8f4"          # --c-bg

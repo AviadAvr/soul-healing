@@ -24,7 +24,4 @@
   <circle cx="1150" cy="250" r="120" fill="#f7efe0" opacity="0.9"/>
   <circle cx="1150" cy="250" r="120" fill="none" stroke="#ffffff" stroke-opacity="0.25" stroke-width="2"/>
 
-  <text x="800" y="470" text-anchor="middle"
-        font-family="Georgia, serif" font-size="34" fill="#ffffff" fill-opacity="0.35"
-        letter-spacing="6">PLACEHOLDER · HERO BACKGROUND</text>
 </svg>

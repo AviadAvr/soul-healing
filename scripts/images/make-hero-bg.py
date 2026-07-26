@@ -34,9 +34,6 @@ svg = f"""
   <circle cx="1150" cy="250" r="120" fill="{b.ORB}" opacity="0.9"/>
   <circle cx="1150" cy="250" r="120" fill="none" stroke="{b.WHITE}" stroke-opacity="0.25" stroke-width="2"/>
 
-  <text x="800" y="470" text-anchor="middle"
-        font-family="Georgia, serif" font-size="34" fill="{b.WHITE}" fill-opacity="0.35"
-        letter-spacing="6">PLACEHOLDER · HERO BACKGROUND</text>
 </svg>
 """
 
