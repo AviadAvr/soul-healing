@@ -1,26 +1,16 @@
 """
-Generate the Soul Pathways logo mark (64x64): a lotus-like bloom over a path.
-Run:  python scripts/make-logo.py
+Generate the Soul Pathways logo mark (64x64): a healing hand with a spiral
+carved through the palm (traced from the source pendant art).
+Run:  python scripts/images/make-logo.py
 Output: public/static/logo/soul-pathways-logo.svg
 """
 import brand as b
+from hand_path import HAND, VIEWBOX
 
 svg = f"""
-<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
-  <!-- Soul Pathways mark: a lotus-like bloom over a gentle path -->
-  <g fill="none" stroke="{b.SAGE_DARK}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-    <!-- centre petal -->
-    <path d="M32 12 C 27 22 27 30 32 38 C 37 30 37 22 32 12 Z"/>
-    <!-- side petals -->
-    <path d="M32 38 C 24 34 19 27 18 18 C 27 20 31 27 32 38 Z"/>
-    <path d="M32 38 C 40 34 45 27 46 18 C 37 20 33 27 32 38 Z"/>
-    <!-- outer petals -->
-    <path d="M32 39 C 22 39 14 35 9 28 C 18 25 27 30 32 39 Z"/>
-    <path d="M32 39 C 42 39 50 35 55 28 C 46 25 37 30 32 39 Z"/>
-  </g>
-  <!-- winding path -->
-  <path d="M20 52 C 28 46 36 58 44 50" fill="none" stroke="{b.GOLD}" stroke-width="2.6"
-        stroke-linecap="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="{VIEWBOX}">
+  <!-- Soul Pathways mark: a healing hand with a spiral carved through the palm -->
+  <path d="{HAND}" fill="{b.SAGE_DARK}" fill-rule="evenodd"/>
 </svg>
 """
 
