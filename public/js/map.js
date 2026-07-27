@@ -10,6 +10,11 @@
     if (!mapEl || typeof L === "undefined") {
         return;
     }
+    // Guard against the script running twice (e.g. re-injection / re-render):
+    // Leaflet throws "Map container is already initialized" otherwise.
+    if (mapEl._leaflet_id) {
+        return;
+    }
 
     // --- Session locations (approximate coordinates) ---
     var locations = [
@@ -68,6 +73,15 @@
 
     // --- Frame both markers nicely on any screen ---
     map.fitBounds(bounds, { padding: [60, 60], maxZoom: 15 });
+
+    // The map is created while the Contact tab is hidden (0×0 container), so
+    // Leaflet measures it wrong. index.js calls this once the panel is shown.
+    window.__spRefreshMap = function () {
+        map.invalidateSize();
+        if (bounds.length) {
+            map.fitBounds(bounds, { padding: [60, 60], maxZoom: 15 });
+        }
+    };
 
     // Re-enable scroll zoom only after the user clicks the map
     map.on("click", function () {

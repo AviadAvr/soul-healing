@@ -203,24 +203,62 @@ h3 {
     min-height: calc(100vh - var(--header-h));
     display: flex;
     align-items: center;
-    background-image: url("../static/images/hero-bg.svg");
-    background-size: cover;
-    background-position: center;
+    background: var(--c-bg-alt);
     color: #fff;
     overflow: hidden;
+}
+
+/* The background photo lives on a pseudo-element so we can make just the image
+   slightly transparent (letting the base colour show through) without fading
+   the hero content. */
+.hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url("../static/images/hero-bg.png");
+    background-size: cover;
+    background-position: center;
+    opacity: 0.9;
+    z-index: 0;
 }
 
 .hero__overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(120deg, rgba(47, 58, 51, 0.62) 0%, rgba(95, 126, 91, 0.42) 100%);
+    z-index: 1;
+    /*background: linear-gradient(120deg, rgba(47, 58, 51, 0.62) 0%, rgba(95, 126, 91, 0.42) 100%);*/
 }
 
 .hero__content {
     position: relative;
     z-index: 2;
     padding-block: 80px;
-    max-width: 720px;
+}
+
+/* Glass "card" that lifts the hero copy off the photo, echoing the rounded
+   cards further down the page (same radius/border/shadow tokens). */
+.hero__card {
+    max-width: 620px;
+    padding: clamp(28px, 4vw, 48px);
+    background: rgba(31, 41, 35, 0.42);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    backdrop-filter: blur(7px);
+    -webkit-backdrop-filter: blur(7px);
+    /* Fade + rise in once the page has loaded. */
+    animation: heroCardIn 2.5s ease-out 0.15s both;
+}
+
+@keyframes heroCardIn {
+    from {
+        opacity: 0;
+        transform: translateY(24px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .hero__eyebrow {
@@ -383,11 +421,14 @@ h3 {
 
 .services__grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 360px));
+    justify-content: center;
     gap: 28px;
 }
 
 .card {
+    display: flex;
+    flex-direction: column;
     background: var(--c-white);
     border-radius: var(--radius-lg);
     padding: 40px 32px;
@@ -396,11 +437,19 @@ h3 {
     transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
+/* Whole card acts as a link to its service page. */
+.card--link {
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+}
+
 .card:hover {
     transform: translateY(-6px);
     box-shadow: var(--shadow-md);
 }
 
+/* Icon + title are centred; body copy stays left-aligned for readability. */
 .card__icon {
     width: 58px;
     height: 58px;
@@ -410,17 +459,35 @@ h3 {
     background: var(--c-bg-alt);
     color: var(--c-sage-dark);
     font-size: 1.6rem;
-    margin-bottom: 22px;
+    margin: 0 auto 22px;
 }
 
 .card__title {
     font-size: 1.6rem;
     margin-bottom: 0.4em;
+    text-align: center;
 }
 
 .card__text {
     color: var(--c-ink-soft);
     margin: 0;
+}
+
+.card__more {
+    margin-top: 18px;
+    color: var(--c-sage-dark);
+    font-weight: 600;
+    font-size: 0.95rem;
+    align-self: center;
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.card--link:hover .card__more,
+.card--link:focus-visible .card__more {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 /* ----------------------- Contact ----------------------- */
@@ -541,21 +608,25 @@ h3 {
     color: var(--c-ink-soft);
 }
 
-.booking__embed {
-    background: var(--c-white);
-    border: 1px solid var(--c-line);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-md);
-    overflow: hidden;
-    padding: 8px;
+/* ----------------------- Service pages (Reiki / Soul Healing) ----------------------- */
+.service-page__body {
+    max-width: 720px;
+    margin: 0 auto;
 }
 
-.booking__embed iframe {
-    display: block;
-    width: 100%;
-    min-height: 600px;
-    border: 0;
-    border-radius: calc(var(--radius-lg) - 8px);
+.service-page__body h3 {
+    font-size: 1.35rem;
+    margin: 1.6em 0 0.4em;
+    color: var(--c-ink);
+}
+
+.service-page__body p {
+    color: var(--c-ink-soft);
+    margin: 0 0 1.1em;
+}
+
+.service-page__body .btn {
+    margin-top: 20px;
 }
 
 /* Map */
@@ -711,6 +782,6 @@ h3 {
 @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
     .hero__scroll-dot { animation: none; }
+    .hero__card { animation: none; }
     * { transition: none !important; }
 }
-

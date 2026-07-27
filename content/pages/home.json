@@ -26,7 +26,7 @@
     "lead": "Each session is gentle, intuitive, and tailored to where you are today. Below is a general overview — feel free to reach out with any questions.",
     "cards": [
       {
-        "icon": "✦",
+        "icon": "𖤓",
         "title": "Reiki Healing",
         "text": "A relaxing, hands-on (or hands-near) energy technique that encourages deep rest and supports your body's natural ability to find balance. Wonderful for stress relief and renewal."
       },
@@ -34,11 +34,6 @@
         "icon": "☾",
         "title": "Soul Healing",
         "text": "A deeper, intuitive session to help release old patterns and reconnect with your inner self. We gently work with energy and intention to bring clarity, lightness, and grounding."
-      },
-      {
-        "icon": "❀",
-        "title": "Combined Session",
-        "text": "A blended experience of Reiki and soul healing, shaped around your needs on the day. Ideal if you're not sure where to begin — we'll find the right rhythm together."
       }
     ]
   },
