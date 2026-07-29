@@ -5,7 +5,7 @@
     "titleLine2": "inner calm",
     "subtitle": "Gentle, supportive energy healing to help you release tension, restore balance, and feel grounded again.",
     "primaryCta": "Book a session",
-    "secondaryCta": "Learn more"
+    "secondaryCta": "About me"
   },
   "about": {
     "eyebrow": "About me",
@@ -22,23 +22,18 @@
   },
   "services": {
     "eyebrow": "What I offer",
-    "title": "Services",
+    "title": "Offerings",
     "lead": "Each session is gentle, intuitive, and tailored to where you are today. Below is a general overview — feel free to reach out with any questions.",
     "cards": [
       {
-        "icon": "✦",
+        "icon": "✹",
         "title": "Reiki Healing",
         "text": "A relaxing, hands-on (or hands-near) energy technique that encourages deep rest and supports your body's natural ability to find balance. Wonderful for stress relief and renewal."
       },
       {
-        "icon": "☾",
+        "icon": "☽",
         "title": "Soul Healing",
         "text": "A deeper, intuitive session to help release old patterns and reconnect with your inner self. We gently work with energy and intention to bring clarity, lightness, and grounding."
-      },
-      {
-        "icon": "❀",
-        "title": "Combined Session",
-        "text": "A blended experience of Reiki and soul healing, shaped around your needs on the day. Ideal if you're not sure where to begin — we'll find the right rhythm together."
       }
     ]
   },
@@ -49,7 +44,6 @@
     "detailsTitle": "Reach me directly",
     "email": "hello@soulpathways.example",
     "phone": "+31 (0)0 000 0000",
-    "instagram": "@soulpathways",
     "locationsTitle": "Locations",
     "locations": [
       {

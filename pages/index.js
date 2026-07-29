@@ -8,9 +8,29 @@ import { client } from "../tina/__generated__/client";
 // next/link and next/image are, so we prefix them manually for GitHub Pages.
 const PREFIX = process.env.NEXT_PUBLIC_BASE_PATH || "";
 
+// Clean, hash-free URL for a tab/section. Home is the base path; everything else
+// is a sub-path. A 404.html fallback re-serves this same SPA for those sub-paths
+// on static hosts (e.g. GitHub Pages), so refresh & deep-links keep working.
+const pathFor = (id) => (!id || id === "home" ? `${PREFIX}/` : `${PREFIX}/${id}/`);
+
+// The current section, derived from the URL path (basePath + slashes stripped).
+const currentSegment = () => {
+  if (typeof window === "undefined") return "";
+  let p = window.location.pathname;
+  if (PREFIX && p.startsWith(PREFIX)) p = p.slice(PREFIX.length);
+  return p.replace(/^\/+|\/+$/g, "");
+};
+
 // The single-page site is organised as tabs; only one panel is visible at a time.
-// "services" lives inside the Home panel.
-const TABS = ["home", "about", "contact", "booking"];
+// Offerings (services) and Contact both live at the bottom of the Home panel;
+// "reiki"/"soul-healing" are their own tabs.
+const TABS = ["home", "about", "reiki", "soul-healing"];
+
+// Maps each service card (by order) to the tab it opens when clicked.
+const SERVICE_TABS = ["reiki", "soul-healing"];
+
+// In-page sections at the bottom of Home (reached by switching to Home + scroll).
+const HOME_SECTIONS = ["offerings", "contact"];
 
 export default function Home(props) {
   // useTina makes the content live-editable inside the Tina admin iframe.
@@ -24,29 +44,52 @@ export default function Home(props) {
   const about = data.page.about;
   const services = data.page.services;
   const contact = data.page.contact;
-  const booking = data.page.booking;
 
   // ── Tab navigation ────────────────────────────────────────────────
   // Default to "home" so the server-rendered HTML matches (good for SEO and
-  // first paint); on the client we sync to the URL hash after hydration.
+  // first paint); on the client we sync to the URL path after hydration.
   const [activeTab, setActiveTab] = useState("home");
 
   useEffect(() => {
-    const applyFromHash = () => {
-      const id = window.location.hash.replace(/^#/, "");
-      if (TABS.includes(id)) setActiveTab(id);
+    const applyFromPath = () => {
+      const seg = currentSegment();
+      if (TABS.includes(seg)) {
+        setActiveTab(seg);
+      } else if (HOME_SECTIONS.includes(seg)) {
+        // Sections at the bottom of Home: show Home, then scroll to them.
+        setActiveTab("home");
+        requestAnimationFrame(() => {
+          document.getElementById(seg)?.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      } else {
+        setActiveTab("home");
+      }
     };
-    applyFromHash(); // handle deep links like /#about on load
-    window.addEventListener("hashchange", applyFromHash); // back/forward + #links
-    return () => window.removeEventListener("hashchange", applyFromHash);
+    applyFromPath(); // deep links like /about or /contact on load / refresh
+    window.addEventListener("popstate", applyFromPath); // browser back / forward
+    return () => window.removeEventListener("popstate", applyFromPath);
   }, []);
 
-  const selectTab = (id) => {
+  // The map lives at the bottom of the Home page; Leaflet mis-measures its
+  // container while a panel is hidden, so refresh it whenever Home is shown.
+  useEffect(() => {
+    if (activeTab !== "home") return;
+    const id = window.setTimeout(() => window.__spRefreshMap?.(), 60);
+    return () => window.clearTimeout(id);
+  }, [activeTab]);
+
+  // Pass `scrollToId` to open the Home tab and smooth-scroll to a section on it.
+  const selectTab = (id, scrollToId) => {
     setActiveTab(id);
     if (typeof window !== "undefined") {
-      // Update the URL without triggering the default jump/scroll.
-      window.history.replaceState(null, "", `#${id}`);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      window.history.pushState(null, "", pathFor(scrollToId || id));
+      if (scrollToId) {
+        requestAnimationFrame(() => {
+          document.getElementById(scrollToId)?.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      } else {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
       // Close the mobile nav menu if it's open.
       document.getElementById("navMenu")?.classList.remove("is-open");
       document.getElementById("navToggle")?.setAttribute("aria-expanded", "false");
@@ -55,7 +98,7 @@ export default function Home(props) {
 
   // Props for a tab link (nav) and a tab panel (section), derived from state.
   const linkProps = (id) => ({
-    href: `#${id}`,
+    href: pathFor(id),
     id: `tab-${id}-link`,
     role: "tab",
     "aria-selected": activeTab === id,
@@ -147,7 +190,7 @@ export default function Home(props) {
       {/* ===================== NAVIGATION ===================== */}
       <header className="site-header" id="top">
         <nav className="nav container" aria-label="Primary">
-          <a href="#home" className="nav__brand">
+          <a href={pathFor("home")} className="nav__brand" onClick={(e) => { e.preventDefault(); selectTab("home"); }}>
             <img
               src={`${PREFIX}/static/logo/soul-pathways-logo.svg`}
               alt="Soul Pathways logo"
@@ -171,9 +214,34 @@ export default function Home(props) {
 
           <ul className="nav__menu" id="navMenu" role="tablist" aria-label="Site sections">
             <li><a {...linkProps("home")} className={`nav__link${activeTab === "home" ? " is-active" : ""}`}>Home</a></li>
+
+            {/* Offerings — hover dropdown on desktop */}
+            <li className="nav__item nav__has-dropdown">
+              <a
+                href={pathFor("offerings")}
+                className={`nav__link nav__dropdown-toggle${activeTab === "reiki" || activeTab === "soul-healing" ? " is-active" : ""}`}
+                aria-haspopup="true"
+                onClick={(e) => { e.preventDefault(); selectTab("home", "offerings"); }}
+              >
+                Offerings <span className="nav__caret" aria-hidden="true">▾</span>
+              </a>
+              <ul className="nav__dropdown">
+                <li><a {...linkProps("reiki")} className={`nav__dropdown-link${activeTab === "reiki" ? " is-active" : ""}`}>Reiki</a></li>
+                <li><a {...linkProps("soul-healing")} className={`nav__dropdown-link${activeTab === "soul-healing" ? " is-active" : ""}`}>Soul Healing</a></li>
+              </ul>
+            </li>
+
+            {/* Direct links — shown only on mobile, where hover menus don't work */}
+            <li className="nav__item--mobile">
+              <a href={pathFor("reiki")} className={`nav__link${activeTab === "reiki" ? " is-active" : ""}`} onClick={(e) => { e.preventDefault(); selectTab("reiki"); }}>Reiki</a>
+            </li>
+            <li className="nav__item--mobile">
+              <a href={pathFor("soul-healing")} className={`nav__link${activeTab === "soul-healing" ? " is-active" : ""}`} onClick={(e) => { e.preventDefault(); selectTab("soul-healing"); }}>Soul Healing</a>
+            </li>
+
             <li><a {...linkProps("about")} className={`nav__link${activeTab === "about" ? " is-active" : ""}`}>About</a></li>
-            <li><a {...linkProps("contact")} className={`nav__link${activeTab === "contact" ? " is-active" : ""}`}>Contact</a></li>
-            <li><a {...linkProps("booking")} className={`nav__link nav__link--cta${activeTab === "booking" ? " is-active" : ""}`}>Book a session</a></li>
+
+            <li><a href={pathFor("contact")} className="nav__link nav__link--cta" onClick={(e) => { e.preventDefault(); selectTab("home", "contact"); }}>Contact</a></li>
           </ul>
         </nav>
       </header>
@@ -184,6 +252,7 @@ export default function Home(props) {
           <section className="hero">
             <div className="hero__overlay"></div>
             <div className="hero__content container">
+            <div className="hero__card">
             <p className="hero__eyebrow" data-tina-field={tinaField(hero, "eyebrow")}>
               {hero.eyebrow}
             </p>
@@ -196,18 +265,19 @@ export default function Home(props) {
               {hero.subtitle}
             </p>
             <div className="hero__actions">
-              <a href="#booking" className="btn btn--primary" data-tab="booking" onClick={(e) => { e.preventDefault(); selectTab("booking"); }} data-tina-field={tinaField(hero, "primaryCta")}>
+              <a href={pathFor("contact")} className="btn btn--primary" data-tab="contact" onClick={(e) => { e.preventDefault(); selectTab("home", "contact"); }} data-tina-field={tinaField(hero, "primaryCta")}>
                 {hero.primaryCta}
               </a>
-              <a href="#about" className="btn btn--ghost" data-tab="about" onClick={(e) => { e.preventDefault(); selectTab("about"); }} data-tina-field={tinaField(hero, "secondaryCta")}>
+              <a href={pathFor("about")} className="btn btn--ghost" data-tab="about" onClick={(e) => { e.preventDefault(); selectTab("about"); }} data-tina-field={tinaField(hero, "secondaryCta")}>
                 {hero.secondaryCta}
               </a>
+            </div>
             </div>
           </div>
           </section>
 
-          {/* ===================== SERVICES (part of Home, Tina-editable) ===================== */}
-          <section className="section services">
+          {/* ===================== OFFERINGS (part of Home, Tina-editable) ===================== */}
+          <section id="offerings" className="section services">
             <div className="container">
               <div className="section__head">
                 <p className="section__eyebrow" data-tina-field={tinaField(services, "eyebrow")}>{services.eyebrow}</p>
@@ -218,15 +288,25 @@ export default function Home(props) {
               </div>
 
               <div className="services__grid">
-                {services.cards?.map((card, i) => (
-                  <article className="card" key={i} data-tina-field={tinaField(card)}>
-                    <div className="card__icon" aria-hidden="true" data-tina-field={tinaField(card, "icon")}>{card.icon}</div>
-                    <h3 className="card__title" data-tina-field={tinaField(card, "title")}>{card.title}</h3>
-                    <p className="card__text" data-tina-field={tinaField(card, "text")}>
-                      {card.text}
-                    </p>
-                  </article>
-                ))}
+                {services.cards?.map((card, i) => {
+                  const tab = SERVICE_TABS[i];
+                  return (
+                    <a
+                      className="card card--link"
+                      key={i}
+                      href={tab ? pathFor(tab) : undefined}
+                      onClick={tab ? (e) => { e.preventDefault(); selectTab(tab); } : undefined}
+                      data-tina-field={tinaField(card)}
+                    >
+                      <div className="card__icon" aria-hidden="true" data-tina-field={tinaField(card, "icon")}>{card.icon}</div>
+                      <h3 className="card__title" data-tina-field={tinaField(card, "title")}>{card.title}</h3>
+                      <p className="card__text" data-tina-field={tinaField(card, "text")}>
+                        {card.text}
+                      </p>
+                      <span className="card__more" aria-hidden="true">Learn more →</span>
+                    </a>
+                  );
+                })}
               </div>
             </div>
           </section>
@@ -260,15 +340,97 @@ export default function Home(props) {
                 ))}
               </ul>
 
-              <a href="#contact" className="btn btn--primary" data-tab="contact" onClick={(e) => { e.preventDefault(); selectTab("contact"); }} data-tina-field={tinaField(about, "cta")}>
+              <a href={pathFor("contact")} className="btn btn--primary" data-tab="contact" onClick={(e) => { e.preventDefault(); selectTab("home", "contact"); }} data-tina-field={tinaField(about, "cta")}>
                 {about.cta}
               </a>
             </div>
           </div>
         </section>
 
-        {/* ===================== CONTACT (Tina-editable) ===================== */}
-        <section {...panelProps("contact", "section contact")}>
+        {/* ===================== REIKI (placeholder — copy to be added later) ===================== */}
+        <section {...panelProps("reiki", "section service-page")}>
+          <div className="container">
+            <div className="section__head">
+              <p className="section__eyebrow">Energy Healing</p>
+              <h2 className="section__title">Reiki</h2>
+              <p className="section__lead">
+                A gentle, hands-on (or hands-near) Japanese energy technique that
+                encourages deep relaxation and supports your body&apos;s natural balance.
+              </p>
+            </div>
+
+            <div className="service-page__body">
+              <p>
+                <em>Placeholder text — your Reiki page copy will go here.</em>
+              </p>
+              <h3>What is Reiki?</h3>
+              <p>
+                Reiki is a calming practice in which the practitioner channels
+                universal life energy to help ease tension and restore a sense of
+                harmony. Describe your approach, lineage, and philosophy here.
+              </p>
+              <h3>What a session feels like</h3>
+              <p>
+                You remain fully clothed and comfortable while gentle hand
+                positions guide the flow of energy. Many people feel warmth,
+                tingling, and deep calm. Add what clients can expect here.
+              </p>
+              <h3>Who it&apos;s for</h3>
+              <p>
+                Reiki can support stress relief, emotional balance, better rest,
+                and general wellbeing. Outline who benefits most and any details
+                to keep in mind before a session.
+              </p>
+              <a href={pathFor("contact")} className="btn btn--primary" onClick={(e) => { e.preventDefault(); selectTab("home", "contact"); }}>
+                Book a session
+              </a>
+            </div>
+          </div>
+        </section>
+
+        {/* ===================== SOUL HEALING (placeholder — copy to be added later) ===================== */}
+        <section {...panelProps("soul-healing", "section service-page")}>
+          <div className="container">
+            <div className="section__head">
+              <p className="section__eyebrow">Inner Work</p>
+              <h2 className="section__title">Soul Healing</h2>
+              <p className="section__lead">
+                A deeper, intuitive session to help release old patterns and
+                reconnect with your inner self — bringing clarity, lightness, and grounding.
+              </p>
+            </div>
+
+            <div className="service-page__body">
+              <p>
+                <em>Placeholder text — your Soul Healing page copy will go here.</em>
+              </p>
+              <h3>What is Soul Healing?</h3>
+              <p>
+                Soul healing gently works with energy and intention to soften
+                long-held patterns and reconnect you with your deeper self.
+                Describe your unique method and intentions here.
+              </p>
+              <h3>What a session feels like</h3>
+              <p>
+                In a calm, held space we explore where energy feels stuck and
+                invite it to move. Many people leave feeling lighter and clearer.
+                Add the flow of your sessions here.
+              </p>
+              <h3>Who it&apos;s for</h3>
+              <p>
+                This work supports those seeking clarity, emotional release, or a
+                renewed sense of grounding. Describe who it&apos;s best suited to and
+                how to prepare.
+              </p>
+              <a href={pathFor("contact")} className="btn btn--primary" onClick={(e) => { e.preventDefault(); selectTab("home", "contact"); }}>
+                Book a session
+              </a>
+            </div>
+          </div>
+        </section>
+
+        {/* ===================== CONTACT — shown at the bottom of the Home page ===================== */}
+        <section id="contact" className="section contact" hidden={activeTab !== "home"}>
           <div className="container">
             <div className="section__head">
               <p className="section__eyebrow" data-tina-field={tinaField(contact, "eyebrow")}>{contact.eyebrow}</p>
@@ -289,10 +451,6 @@ export default function Home(props) {
                   <li>
                     <span className="contact__label">Phone</span>
                     <a href={`tel:${(contact.phone || "").replace(/[^+\d]/g, "")}`} data-tina-field={tinaField(contact, "phone")}>{contact.phone}</a>
-                  </li>
-                  <li>
-                    <span className="contact__label">Instagram</span>
-                    <a href="#" data-tina-field={tinaField(contact, "instagram")}>{contact.instagram}</a>
                   </li>
                 </ul>
 
@@ -343,27 +501,6 @@ export default function Home(props) {
                 <span className="legend__pin legend__pin--green"></span> {contact.locations?.[0]?.name}
                 <span className="legend__pin legend__pin--violet"></span> {contact.locations?.[1]?.name}
               </p>
-            </div>
-          </div>
-        </section>
-
-        {/* ===================== BOOKING (Tina-editable) ===================== */}
-        <section {...panelProps("booking", "section booking")}>
-          <div className="container">
-            <div className="section__head">
-              <p className="section__eyebrow" data-tina-field={tinaField(booking, "eyebrow")}>{booking.eyebrow}</p>
-              <h2 className="section__title" data-tina-field={tinaField(booking, "title")}>{booking.title}</h2>
-              <p className="section__lead" data-tina-field={tinaField(booking, "lead")}>
-                {booking.lead}
-              </p>
-            </div>
-            <div className="booking__embed">
-              <div
-                className="calendly-inline-widget"
-                data-url={booking.calendlyUrl}
-                data-tina-field={tinaField(booking, "calendlyUrl")}
-              ></div>
-              <Script src="https://assets.calendly.com/assets/external/widget.js" strategy="afterInteractive" />
             </div>
           </div>
         </section>
