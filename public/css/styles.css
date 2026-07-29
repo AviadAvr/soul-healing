@@ -180,6 +180,90 @@ h3 {
     color: #fff;
 }
 
+/* Offerings dropdown (desktop hover menu) */
+.nav__has-dropdown {
+    position: relative;
+}
+
+.nav__dropdown-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+}
+
+.nav__dropdown-toggle.is-active {
+    color: var(--c-sage-dark);
+}
+
+.nav__caret {
+    font-size: 0.7em;
+    transition: transform 0.2s ease;
+}
+
+.nav__has-dropdown:hover .nav__caret,
+.nav__has-dropdown:focus-within .nav__caret {
+    transform: rotate(180deg);
+}
+
+.nav__dropdown {
+    position: absolute;
+    top: 100%;
+    left: 100%;
+    transform: translate(-50%, 8px);
+    min-width: 190px;
+    list-style: none;
+    margin: 0;
+    padding: 8px;
+    background: var(--c-white);
+    border: 1px solid var(--c-line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-md);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+    z-index: 1001;
+}
+
+/* Invisible bridge so the menu stays open while moving the cursor down onto it. */
+.nav__dropdown::before {
+    content: "";
+    position: absolute;
+    top: -12px;
+    left: 0;
+    right: 0;
+    height: 12px;
+}
+
+.nav__has-dropdown:hover .nav__dropdown,
+.nav__has-dropdown:focus-within .nav__dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, 0);
+}
+
+.nav__dropdown-link {
+    display: block;
+    padding: 10px 14px;
+    border-radius: 10px;
+    color: var(--c-ink-soft);
+    font-weight: 600;
+    font-size: 0.95rem;
+    white-space: nowrap;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.nav__dropdown-link:hover,
+.nav__dropdown-link.is-active {
+    background: var(--c-bg-alt);
+    color: var(--c-sage-dark);
+}
+
+/* Direct Reiki / Soul Healing links only appear on mobile. */
+.nav__item--mobile {
+    display: none;
+}
+
 .nav__toggle {
     display: none;
     flex-direction: column;
@@ -239,6 +323,7 @@ h3 {
    cards further down the page (same radius/border/shadow tokens). */
 .hero__card {
     max-width: 620px;
+    margin-inline: auto;
     padding: clamp(28px, 4vw, 48px);
     background: rgba(31, 41, 35, 0.42);
     border: 1px solid rgba(255, 255, 255, 0.18);
@@ -713,6 +798,15 @@ h3 {
 @media (max-width: 860px) {
     .nav__toggle {
         display: flex;
+    }
+
+    /* Swap the Offerings hover menu for direct links on touch/small screens. */
+    .nav__has-dropdown {
+        display: none;
+    }
+
+    .nav__item--mobile {
+        display: block;
     }
 
     .nav__menu {

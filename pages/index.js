@@ -9,11 +9,15 @@ import { client } from "../tina/__generated__/client";
 const PREFIX = process.env.NEXT_PUBLIC_BASE_PATH || "";
 
 // The single-page site is organised as tabs; only one panel is visible at a time.
-// "services" lives inside the Home panel; "reiki"/"soul-healing" are their own tabs.
-const TABS = ["home", "about", "reiki", "soul-healing", "contact"];
+// Offerings (services) and Contact both live at the bottom of the Home panel;
+// "reiki"/"soul-healing" are their own tabs.
+const TABS = ["home", "about", "reiki", "soul-healing"];
 
 // Maps each service card (by order) to the tab it opens when clicked.
 const SERVICE_TABS = ["reiki", "soul-healing"];
+
+// In-page sections at the bottom of Home (reached by switching to Home + scroll).
+const HOME_SECTIONS = ["offerings", "contact"];
 
 export default function Home(props) {
   // useTina makes the content live-editable inside the Tina admin iframe.
@@ -36,27 +40,41 @@ export default function Home(props) {
   useEffect(() => {
     const applyFromHash = () => {
       const id = window.location.hash.replace(/^#/, "");
-      if (TABS.includes(id)) setActiveTab(id);
+      if (TABS.includes(id)) {
+        setActiveTab(id);
+      } else if (HOME_SECTIONS.includes(id)) {
+        // Show Home, then scroll down to the in-page section (Offerings/Contact).
+        setActiveTab("home");
+        requestAnimationFrame(() => {
+          document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
     };
-    applyFromHash(); // handle deep links like /#about on load
+    applyFromHash(); // handle deep links like /#about or /#contact on load
     window.addEventListener("hashchange", applyFromHash); // back/forward + #links
     return () => window.removeEventListener("hashchange", applyFromHash);
   }, []);
 
-  // Leaflet mis-measures its container while the Contact panel is hidden, which
-  // leaves the map grey/half-rendered. Refresh it once the panel becomes visible.
+  // The map lives at the bottom of the Home page; Leaflet mis-measures its
+  // container while a panel is hidden, so refresh it whenever Home is shown.
   useEffect(() => {
-    if (activeTab !== "contact") return;
+    if (activeTab !== "home") return;
     const id = window.setTimeout(() => window.__spRefreshMap?.(), 60);
     return () => window.clearTimeout(id);
   }, [activeTab]);
 
-  const selectTab = (id) => {
+  // Pass `scrollToId` to open the Home tab and smooth-scroll to a section on it.
+  const selectTab = (id, scrollToId) => {
     setActiveTab(id);
     if (typeof window !== "undefined") {
-      // Update the URL without triggering the default jump/scroll.
-      window.history.replaceState(null, "", `#${id}`);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      window.history.replaceState(null, "", `#${scrollToId || id}`);
+      if (scrollToId) {
+        requestAnimationFrame(() => {
+          document.getElementById(scrollToId)?.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      } else {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
       // Close the mobile nav menu if it's open.
       document.getElementById("navMenu")?.classList.remove("is-open");
       document.getElementById("navToggle")?.setAttribute("aria-expanded", "false");
@@ -181,10 +199,34 @@ export default function Home(props) {
 
           <ul className="nav__menu" id="navMenu" role="tablist" aria-label="Site sections">
             <li><a {...linkProps("home")} className={`nav__link${activeTab === "home" ? " is-active" : ""}`}>Home</a></li>
+
+            {/* Offerings — hover dropdown on desktop */}
+            <li className="nav__item nav__has-dropdown">
+              <a
+                href="#offerings"
+                className={`nav__link nav__dropdown-toggle${activeTab === "reiki" || activeTab === "soul-healing" ? " is-active" : ""}`}
+                aria-haspopup="true"
+                onClick={(e) => { e.preventDefault(); selectTab("home", "offerings"); }}
+              >
+                Offerings <span className="nav__caret" aria-hidden="true">▾</span>
+              </a>
+              <ul className="nav__dropdown">
+                <li><a {...linkProps("reiki")} className={`nav__dropdown-link${activeTab === "reiki" ? " is-active" : ""}`}>Reiki</a></li>
+                <li><a {...linkProps("soul-healing")} className={`nav__dropdown-link${activeTab === "soul-healing" ? " is-active" : ""}`}>Soul Healing</a></li>
+              </ul>
+            </li>
+
+            {/* Direct links — shown only on mobile, where hover menus don't work */}
+            <li className="nav__item--mobile">
+              <a href="#reiki" className={`nav__link${activeTab === "reiki" ? " is-active" : ""}`} onClick={(e) => { e.preventDefault(); selectTab("reiki"); }}>Reiki</a>
+            </li>
+            <li className="nav__item--mobile">
+              <a href="#soul-healing" className={`nav__link${activeTab === "soul-healing" ? " is-active" : ""}`} onClick={(e) => { e.preventDefault(); selectTab("soul-healing"); }}>Soul Healing</a>
+            </li>
+
             <li><a {...linkProps("about")} className={`nav__link${activeTab === "about" ? " is-active" : ""}`}>About</a></li>
-            <li><a {...linkProps("reiki")} className={`nav__link${activeTab === "reiki" ? " is-active" : ""}`}>Reiki</a></li>
-            <li><a {...linkProps("soul-healing")} className={`nav__link${activeTab === "soul-healing" ? " is-active" : ""}`}>Soul Healing</a></li>
-            <li><a {...linkProps("contact")} className={`nav__link nav__link--cta${activeTab === "contact" ? " is-active" : ""}`}>Contact</a></li>
+
+            <li><a href="#contact" className="nav__link nav__link--cta" onClick={(e) => { e.preventDefault(); selectTab("home", "contact"); }}>Contact</a></li>
           </ul>
         </nav>
       </header>
@@ -208,7 +250,7 @@ export default function Home(props) {
               {hero.subtitle}
             </p>
             <div className="hero__actions">
-              <a href="#contact" className="btn btn--primary" data-tab="contact" onClick={(e) => { e.preventDefault(); selectTab("contact"); }} data-tina-field={tinaField(hero, "primaryCta")}>
+              <a href="#contact" className="btn btn--primary" data-tab="contact" onClick={(e) => { e.preventDefault(); selectTab("home", "contact"); }} data-tina-field={tinaField(hero, "primaryCta")}>
                 {hero.primaryCta}
               </a>
               <a href="#about" className="btn btn--ghost" data-tab="about" onClick={(e) => { e.preventDefault(); selectTab("about"); }} data-tina-field={tinaField(hero, "secondaryCta")}>
@@ -219,8 +261,8 @@ export default function Home(props) {
           </div>
           </section>
 
-          {/* ===================== SERVICES (part of Home, Tina-editable) ===================== */}
-          <section className="section services">
+          {/* ===================== OFFERINGS (part of Home, Tina-editable) ===================== */}
+          <section id="offerings" className="section services">
             <div className="container">
               <div className="section__head">
                 <p className="section__eyebrow" data-tina-field={tinaField(services, "eyebrow")}>{services.eyebrow}</p>
@@ -283,7 +325,7 @@ export default function Home(props) {
                 ))}
               </ul>
 
-              <a href="#contact" className="btn btn--primary" data-tab="contact" onClick={(e) => { e.preventDefault(); selectTab("contact"); }} data-tina-field={tinaField(about, "cta")}>
+              <a href="#contact" className="btn btn--primary" data-tab="contact" onClick={(e) => { e.preventDefault(); selectTab("home", "contact"); }} data-tina-field={tinaField(about, "cta")}>
                 {about.cta}
               </a>
             </div>
@@ -324,7 +366,7 @@ export default function Home(props) {
                 and general wellbeing. Outline who benefits most and any details
                 to keep in mind before a session.
               </p>
-              <a href="#contact" className="btn btn--primary" onClick={(e) => { e.preventDefault(); selectTab("contact"); }}>
+              <a href="#contact" className="btn btn--primary" onClick={(e) => { e.preventDefault(); selectTab("home", "contact"); }}>
                 Book a session
               </a>
             </div>
@@ -365,15 +407,15 @@ export default function Home(props) {
                 renewed sense of grounding. Describe who it&apos;s best suited to and
                 how to prepare.
               </p>
-              <a href="#contact" className="btn btn--primary" onClick={(e) => { e.preventDefault(); selectTab("contact"); }}>
+              <a href="#contact" className="btn btn--primary" onClick={(e) => { e.preventDefault(); selectTab("home", "contact"); }}>
                 Book a session
               </a>
             </div>
           </div>
         </section>
 
-        {/* ===================== CONTACT (Tina-editable) ===================== */}
-        <section {...panelProps("contact", "section contact")}>
+        {/* ===================== CONTACT — shown at the bottom of the Home page ===================== */}
+        <section id="contact" className="section contact" hidden={activeTab !== "home"}>
           <div className="container">
             <div className="section__head">
               <p className="section__eyebrow" data-tina-field={tinaField(contact, "eyebrow")}>{contact.eyebrow}</p>
@@ -394,10 +436,6 @@ export default function Home(props) {
                   <li>
                     <span className="contact__label">Phone</span>
                     <a href={`tel:${(contact.phone || "").replace(/[^+\d]/g, "")}`} data-tina-field={tinaField(contact, "phone")}>{contact.phone}</a>
-                  </li>
-                  <li>
-                    <span className="contact__label">Instagram</span>
-                    <a href="#" data-tina-field={tinaField(contact, "instagram")}>{contact.instagram}</a>
                   </li>
                 </ul>
 

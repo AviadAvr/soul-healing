@@ -135,7 +135,6 @@ export default defineConfig({
               { type: "string", name: "detailsTitle", label: "“Reach me” heading" },
               { type: "string", name: "email", label: "Email" },
               { type: "string", name: "phone", label: "Phone" },
-              { type: "string", name: "instagram", label: "Instagram handle" },
               { type: "string", name: "locationsTitle", label: "Locations heading" },
               {
                 type: "object",
