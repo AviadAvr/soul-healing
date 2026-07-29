@@ -77,7 +77,10 @@ h3 {
 
 /* ----------------------- Buttons ----------------------- */
 .btn {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
     padding: 13px 28px;
     border-radius: 999px;
     font-family: var(--font-body);
@@ -161,10 +164,18 @@ h3 {
     font-weight: 600;
     font-size: 0.95rem;
     position: relative;
-    transition: color 0.2s ease;
+    padding: 8px 14px;
+    border-radius: 999px;
+    transition: color 0.2s ease, background 0.2s ease;
 }
 
-.nav__link:hover {
+.nav__link:hover,
+.nav__link:focus-visible {
+    color: var(--c-sage-dark);
+    background: var(--c-bg-alt);
+}
+
+.nav__link.is-active {
     color: var(--c-sage-dark);
 }
 
@@ -201,8 +212,7 @@ h3 {
     transition: transform 0.2s ease;
 }
 
-.nav__has-dropdown:hover .nav__caret,
-.nav__has-dropdown:focus-within .nav__caret {
+.nav__has-dropdown:hover .nav__caret {
     transform: rotate(180deg);
 }
 
@@ -235,8 +245,7 @@ h3 {
     height: 12px;
 }
 
-.nav__has-dropdown:hover .nav__dropdown,
-.nav__has-dropdown:focus-within .nav__dropdown {
+.nav__has-dropdown:hover .nav__dropdown {
     opacity: 1;
     visibility: visible;
     transform: translate(-50%, 0);
@@ -612,6 +621,7 @@ h3 {
     align-items: center;
     gap: 8px;
     width: fit-content;
+    margin-top: 4px;
 }
 
 .contact__wa-icon {
@@ -736,12 +746,38 @@ h3 {
 }
 
 .contact__map {
+    position: relative;
     height: 420px;
     width: 100%;
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-md);
     border: 1px solid var(--c-line);
     z-index: 1;
+}
+
+/* Hint shown when a single finger tries to pan the map (touch devices). */
+.sp-map-hint {
+    position: absolute;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    text-align: center;
+    font-weight: 600;
+    color: #fff;
+    background: rgba(47, 58, 51, 0.55);
+    border-radius: var(--radius-lg);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.25s ease, visibility 0.25s;
+}
+
+.sp-map-hint.is-visible {
+    opacity: 1;
+    visibility: visible;
 }
 
 .contact__map-legend {
@@ -851,7 +887,6 @@ h3 {
         display: block;
         padding: 14px 0;
         width: 100%;
-        border-bottom: 1px solid var(--c-line);
     }
 
     .nav__link--cta {

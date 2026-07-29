@@ -90,5 +90,71 @@
     map.on("mouseout", function () {
         map.scrollWheelZoom.disable();
     });
+
+    // --- Require two fingers to pan on touch devices ---
+    // Panning with a single finger should scroll the page (not drag the map),
+    // so we only enable Leaflet's dragging while two or more fingers are down.
+    // A brief hint appears if the user tries to move the map with one finger.
+    var isTouch =
+        "ontouchstart" in window ||
+        (navigator.maxTouchPoints || 0) > 0;
+
+    if (isTouch) {
+        // Build the "use two fingers" hint overlay.
+        var hint = document.createElement("div");
+        hint.className = "sp-map-hint";
+        hint.textContent = "Use two fingers to move the map";
+        mapEl.appendChild(hint);
+
+        var hintTimer = null;
+        function showHint() {
+            hint.classList.add("is-visible");
+            if (hintTimer) {
+                clearTimeout(hintTimer);
+            }
+            hintTimer = setTimeout(function () {
+                hint.classList.remove("is-visible");
+            }, 1400);
+        }
+
+        // Start with dragging off; enable it only for multi-touch gestures.
+        map.dragging.disable();
+
+        mapEl.addEventListener(
+            "touchstart",
+            function (e) {
+                if (e.touches.length >= 2) {
+                    map.dragging.enable();
+                    hint.classList.remove("is-visible");
+                } else {
+                    map.dragging.disable();
+                }
+            },
+            { passive: true }
+        );
+
+        mapEl.addEventListener(
+            "touchmove",
+            function (e) {
+                // A single-finger drag over the map: keep dragging disabled so the
+                // page scrolls, and nudge the user to use two fingers instead.
+                if (e.touches.length < 2) {
+                    map.dragging.disable();
+                    showHint();
+                }
+            },
+            { passive: true }
+        );
+
+        mapEl.addEventListener(
+            "touchend",
+            function (e) {
+                if (e.touches.length < 2) {
+                    map.dragging.disable();
+                }
+            },
+            { passive: true }
+        );
+    }
 })();
 
