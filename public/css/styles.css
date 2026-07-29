@@ -299,7 +299,7 @@ h3 {
     content: "";
     position: absolute;
     inset: 0;
-    background-image: url("../static/images/hero-bg.png");
+    background-image: url("../static/images/hero-bg.webp");
     background-size: cover;
     background-position: center;
     opacity: 0.9;
