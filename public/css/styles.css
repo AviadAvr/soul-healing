@@ -372,6 +372,7 @@ h3 {
 .hero__actions {
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
     gap: 14px;
 }
 

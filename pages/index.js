@@ -8,6 +8,19 @@ import { client } from "../tina/__generated__/client";
 // next/link and next/image are, so we prefix them manually for GitHub Pages.
 const PREFIX = process.env.NEXT_PUBLIC_BASE_PATH || "";
 
+// Clean, hash-free URL for a tab/section. Home is the base path; everything else
+// is a sub-path. A 404.html fallback re-serves this same SPA for those sub-paths
+// on static hosts (e.g. GitHub Pages), so refresh & deep-links keep working.
+const pathFor = (id) => (!id || id === "home" ? `${PREFIX}/` : `${PREFIX}/${id}/`);
+
+// The current section, derived from the URL path (basePath + slashes stripped).
+const currentSegment = () => {
+  if (typeof window === "undefined") return "";
+  let p = window.location.pathname;
+  if (PREFIX && p.startsWith(PREFIX)) p = p.slice(PREFIX.length);
+  return p.replace(/^\/+|\/+$/g, "");
+};
+
 // The single-page site is organised as tabs; only one panel is visible at a time.
 // Offerings (services) and Contact both live at the bottom of the Home panel;
 // "reiki"/"soul-healing" are their own tabs.
@@ -34,25 +47,27 @@ export default function Home(props) {
 
   // ── Tab navigation ────────────────────────────────────────────────
   // Default to "home" so the server-rendered HTML matches (good for SEO and
-  // first paint); on the client we sync to the URL hash after hydration.
+  // first paint); on the client we sync to the URL path after hydration.
   const [activeTab, setActiveTab] = useState("home");
 
   useEffect(() => {
-    const applyFromHash = () => {
-      const id = window.location.hash.replace(/^#/, "");
-      if (TABS.includes(id)) {
-        setActiveTab(id);
-      } else if (HOME_SECTIONS.includes(id)) {
-        // Show Home, then scroll down to the in-page section (Offerings/Contact).
+    const applyFromPath = () => {
+      const seg = currentSegment();
+      if (TABS.includes(seg)) {
+        setActiveTab(seg);
+      } else if (HOME_SECTIONS.includes(seg)) {
+        // Sections at the bottom of Home: show Home, then scroll to them.
         setActiveTab("home");
         requestAnimationFrame(() => {
-          document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+          document.getElementById(seg)?.scrollIntoView({ behavior: "smooth", block: "start" });
         });
+      } else {
+        setActiveTab("home");
       }
     };
-    applyFromHash(); // handle deep links like /#about or /#contact on load
-    window.addEventListener("hashchange", applyFromHash); // back/forward + #links
-    return () => window.removeEventListener("hashchange", applyFromHash);
+    applyFromPath(); // deep links like /about or /contact on load / refresh
+    window.addEventListener("popstate", applyFromPath); // browser back / forward
+    return () => window.removeEventListener("popstate", applyFromPath);
   }, []);
 
   // The map lives at the bottom of the Home page; Leaflet mis-measures its
@@ -67,7 +82,7 @@ export default function Home(props) {
   const selectTab = (id, scrollToId) => {
     setActiveTab(id);
     if (typeof window !== "undefined") {
-      window.history.replaceState(null, "", `#${scrollToId || id}`);
+      window.history.pushState(null, "", pathFor(scrollToId || id));
       if (scrollToId) {
         requestAnimationFrame(() => {
           document.getElementById(scrollToId)?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -83,7 +98,7 @@ export default function Home(props) {
 
   // Props for a tab link (nav) and a tab panel (section), derived from state.
   const linkProps = (id) => ({
-    href: `#${id}`,
+    href: pathFor(id),
     id: `tab-${id}-link`,
     role: "tab",
     "aria-selected": activeTab === id,
@@ -175,7 +190,7 @@ export default function Home(props) {
       {/* ===================== NAVIGATION ===================== */}
       <header className="site-header" id="top">
         <nav className="nav container" aria-label="Primary">
-          <a href="#home" className="nav__brand">
+          <a href={pathFor("home")} className="nav__brand" onClick={(e) => { e.preventDefault(); selectTab("home"); }}>
             <img
               src={`${PREFIX}/static/logo/soul-pathways-logo.svg`}
               alt="Soul Pathways logo"
@@ -203,7 +218,7 @@ export default function Home(props) {
             {/* Offerings — hover dropdown on desktop */}
             <li className="nav__item nav__has-dropdown">
               <a
-                href="#offerings"
+                href={pathFor("offerings")}
                 className={`nav__link nav__dropdown-toggle${activeTab === "reiki" || activeTab === "soul-healing" ? " is-active" : ""}`}
                 aria-haspopup="true"
                 onClick={(e) => { e.preventDefault(); selectTab("home", "offerings"); }}
@@ -218,15 +233,15 @@ export default function Home(props) {
 
             {/* Direct links — shown only on mobile, where hover menus don't work */}
             <li className="nav__item--mobile">
-              <a href="#reiki" className={`nav__link${activeTab === "reiki" ? " is-active" : ""}`} onClick={(e) => { e.preventDefault(); selectTab("reiki"); }}>Reiki</a>
+              <a href={pathFor("reiki")} className={`nav__link${activeTab === "reiki" ? " is-active" : ""}`} onClick={(e) => { e.preventDefault(); selectTab("reiki"); }}>Reiki</a>
             </li>
             <li className="nav__item--mobile">
-              <a href="#soul-healing" className={`nav__link${activeTab === "soul-healing" ? " is-active" : ""}`} onClick={(e) => { e.preventDefault(); selectTab("soul-healing"); }}>Soul Healing</a>
+              <a href={pathFor("soul-healing")} className={`nav__link${activeTab === "soul-healing" ? " is-active" : ""}`} onClick={(e) => { e.preventDefault(); selectTab("soul-healing"); }}>Soul Healing</a>
             </li>
 
             <li><a {...linkProps("about")} className={`nav__link${activeTab === "about" ? " is-active" : ""}`}>About</a></li>
 
-            <li><a href="#contact" className="nav__link nav__link--cta" onClick={(e) => { e.preventDefault(); selectTab("home", "contact"); }}>Contact</a></li>
+            <li><a href={pathFor("contact")} className="nav__link nav__link--cta" onClick={(e) => { e.preventDefault(); selectTab("home", "contact"); }}>Contact</a></li>
           </ul>
         </nav>
       </header>
@@ -250,10 +265,10 @@ export default function Home(props) {
               {hero.subtitle}
             </p>
             <div className="hero__actions">
-              <a href="#contact" className="btn btn--primary" data-tab="contact" onClick={(e) => { e.preventDefault(); selectTab("home", "contact"); }} data-tina-field={tinaField(hero, "primaryCta")}>
+              <a href={pathFor("contact")} className="btn btn--primary" data-tab="contact" onClick={(e) => { e.preventDefault(); selectTab("home", "contact"); }} data-tina-field={tinaField(hero, "primaryCta")}>
                 {hero.primaryCta}
               </a>
-              <a href="#about" className="btn btn--ghost" data-tab="about" onClick={(e) => { e.preventDefault(); selectTab("about"); }} data-tina-field={tinaField(hero, "secondaryCta")}>
+              <a href={pathFor("about")} className="btn btn--ghost" data-tab="about" onClick={(e) => { e.preventDefault(); selectTab("about"); }} data-tina-field={tinaField(hero, "secondaryCta")}>
                 {hero.secondaryCta}
               </a>
             </div>
@@ -279,7 +294,7 @@ export default function Home(props) {
                     <a
                       className="card card--link"
                       key={i}
-                      href={tab ? `#${tab}` : undefined}
+                      href={tab ? pathFor(tab) : undefined}
                       onClick={tab ? (e) => { e.preventDefault(); selectTab(tab); } : undefined}
                       data-tina-field={tinaField(card)}
                     >
@@ -325,7 +340,7 @@ export default function Home(props) {
                 ))}
               </ul>
 
-              <a href="#contact" className="btn btn--primary" data-tab="contact" onClick={(e) => { e.preventDefault(); selectTab("home", "contact"); }} data-tina-field={tinaField(about, "cta")}>
+              <a href={pathFor("contact")} className="btn btn--primary" data-tab="contact" onClick={(e) => { e.preventDefault(); selectTab("home", "contact"); }} data-tina-field={tinaField(about, "cta")}>
                 {about.cta}
               </a>
             </div>
@@ -366,7 +381,7 @@ export default function Home(props) {
                 and general wellbeing. Outline who benefits most and any details
                 to keep in mind before a session.
               </p>
-              <a href="#contact" className="btn btn--primary" onClick={(e) => { e.preventDefault(); selectTab("home", "contact"); }}>
+              <a href={pathFor("contact")} className="btn btn--primary" onClick={(e) => { e.preventDefault(); selectTab("home", "contact"); }}>
                 Book a session
               </a>
             </div>
@@ -407,7 +422,7 @@ export default function Home(props) {
                 renewed sense of grounding. Describe who it&apos;s best suited to and
                 how to prepare.
               </p>
-              <a href="#contact" className="btn btn--primary" onClick={(e) => { e.preventDefault(); selectTab("home", "contact"); }}>
+              <a href={pathFor("contact")} className="btn btn--primary" onClick={(e) => { e.preventDefault(); selectTab("home", "contact"); }}>
                 Book a session
               </a>
             </div>
