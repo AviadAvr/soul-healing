@@ -1,9 +1,9 @@
 {
   "hero": {
-    "eyebrow": "Reiki & Soul Healing · Amsterdam",
-    "titleLine1": "Reconnect with your",
-    "titleLine2": "inner calm",
-    "subtitle": "Gentle, supportive energy healing to help you release tension, restore balance, and feel grounded again.",
+    "eyebrow": "Reiki & Soul Healing",
+    "titleLine1": "Back in touch",
+    "titleLine2": "with your Self",
+    "subtitle": "Reconnect with a deeper sense of balance, presence and wellbeing in your life. Healing releases what has long been held within, restoring your body’s natural alignment.",
     "primaryCta": "Book a session",
     "secondaryCta": "About me"
   },
@@ -21,82 +21,36 @@
     "cta": "Get in touch"
   },
   "services": {
-    "eyebrow": "What I offer",
-    "title": "Offerings",
-    "lead": "Each session is gentle, intuitive, and tailored to where you are today. Below is a general overview — feel free to reach out with any questions.",
+    "eyebrow": "",
+    "title": "Services",
+    "lead": "I offer different energy healing methods to facilitate a personalised process according to your needs and preferences. Feel free to reach out with any questions, I am here to support you on your healing journey.",
     "cards": [
       {
         "icon": "✹",
-        "title": "Reiki Healing",
-        "text": "A relaxing, hands-on (or hands-near) energy technique that encourages deep rest and supports your body's natural ability to find balance. Wonderful for stress relief and renewal."
+        "title": "Reiki",
+        "text": "Works with the body’s energy systems to enhance its natural healing abilities. By assisting your body to replenish its energy stores, Reiki supports your nervous system for a greater sense of relief and restoration."
       },
       {
         "icon": "☽",
         "title": "Soul Healing",
-        "text": "A deeper, intuitive session to help release old patterns and reconnect with your inner self. We gently work with energy and intention to bring clarity, lightness, and grounding."
+        "text": "Works with the energies of the whole person—the physical and energetic bodies, emotions, thoughts, personality and Soul. Guides your Soul’s energy to move through areas of dis-ease or imbalance to bring you back to a state of “wholeness”."
       }
     ]
   },
   "contact": {
-    "eyebrow": "Get in touch",
+    "eyebrow": "",
     "title": "Contact & Booking",
-    "lead": "Sessions are available at two welcoming locations in Amsterdam. Reach out to book, or use the weekly availability below as a guide.",
-    "detailsTitle": "Reach me directly",
-    "email": "hello@soulpathways.example",
+    "lead": "Temp Text: 'Sessions are available at two welcoming locations in Amsterdam. Reach out to book, or use the weekly availability below as a guide.'",
+    "detailsTitle": "Reach out",
     "phone": "+31 (0)6 4497 4792",
-    "locationsTitle": "Locations",
-    "locations": [
-      {
-        "name": "Common Ground",
-        "addressLines": [
-          "Zeeburgerdijk 265",
-          "1095 AC Amsterdam"
-        ]
-      },
-      {
-        "name": "The Integration Room",
-        "addressLines": [
-          "Walk-In Therapy Studio Amsterdam",
-          "Eerste Laurierdwarsstraat 2",
-          "1016 PX Amsterdam"
-        ]
-      }
-    ],
-    "scheduleTitle": "Weekly availability",
-    "schedule": [
-      {
-        "day": "Monday",
-        "hours": "10:00 – 16:00",
-        "location": "Common Ground"
-      },
-      {
-        "day": "Tuesday",
-        "hours": "12:00 – 18:00",
-        "location": "The Integration Room"
-      },
-      {
-        "day": "Wednesday",
-        "hours": "By appointment",
-        "location": "—"
-      },
-      {
-        "day": "Thursday",
-        "hours": "10:00 – 16:00",
-        "location": "Common Ground"
-      },
-      {
-        "day": "Friday",
-        "hours": "12:00 – 18:00",
-        "location": "The Integration Room"
-      },
-      {
-        "day": "Sat – Sun",
-        "hours": "Closed",
-        "location": "—"
-      }
-    ],
-    "scheduleNote": "Times above are a general guide. To reserve your spot, use the online booking calendar below.",
-    "mapTitle": "Find me on the map"
+    "email": "hello@soulpathways.example",
+    "pricingTitle": "Pricing",
+    "pricingSingle": "Single treatment: €50",
+    "pricingReduced": "Reduced rate: €35",
+    "pricingReducedNote": "For students and those experiencing financial constraints. Please choose the rate that best reflects your current circumstances.",
+    "bookingTitle": "Booking",
+    "integrationRoomUrl": "https://www.theintegrationroom.nl/",
+    "bookingHomeNote": "Under certain circumstances, I may be able to offer treatments in your home. Reach out if this improves your access to care."
   },
   "booking": {
     "eyebrow": "Appointments",

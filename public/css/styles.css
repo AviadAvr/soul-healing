@@ -334,6 +334,7 @@ h3 {
     max-width: 620px;
     margin-inline: auto;
     padding: clamp(28px, 4vw, 48px);
+    text-align: center;
     background: rgba(31, 41, 35, 0.42);
     border: 1px solid rgba(255, 255, 255, 0.18);
     border-radius: var(--radius-lg);
@@ -374,6 +375,7 @@ h3 {
 .hero__subtitle {
     font-size: clamp(1.05rem, 2vw, 1.3rem);
     max-width: 38ch;
+    margin-inline: auto;
     color: rgba(255, 255, 255, 0.92);
     margin-bottom: 2em;
 }
@@ -593,9 +595,16 @@ h3 {
 .contact__grid {
     display: grid;
     grid-template-columns: 1fr 1.1fr;
-    gap: clamp(28px, 5vw, 56px);
+    grid-template-areas:
+        "reach   booking"
+        "pricing booking";
+    gap: clamp(20px, 3vw, 32px) clamp(28px, 5vw, 56px);
     margin-bottom: clamp(40px, 6vw, 64px);
 }
+
+.contact__details { grid-area: reach; }
+.contact__pricing { grid-area: pricing; }
+.contact__schedule { grid-area: booking; }
 
 .contact__subtitle {
     font-size: 1.4rem;
@@ -653,6 +662,25 @@ h3 {
 
 .contact__location-sub {
     font-size: 0.9rem;
+}
+
+/* Pricing lines */
+.contact__price {
+    color: var(--c-ink-soft);
+    margin: 0 0 1em;
+}
+
+/* Inline links inside the booking text — made obvious so people know they're
+   clickable (the global <a> resets text-decoration off). */
+.contact__schedule p a {
+    color: var(--c-sage-dark);
+    font-weight: 700;
+    transition: color 0.15s ease;
+}
+
+.contact__schedule p a:hover,
+.contact__schedule p a:focus-visible {
+    color: var(--c-ink);
 }
 
 /* Schedule table */
@@ -898,6 +926,13 @@ h3 {
     .about__grid,
     .contact__grid {
         grid-template-columns: 1fr;
+    }
+
+    .contact__grid {
+        grid-template-areas:
+            "reach"
+            "booking"
+            "pricing";
     }
 
     .about__media {

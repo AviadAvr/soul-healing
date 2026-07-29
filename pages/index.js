@@ -73,14 +73,6 @@ export default function Home(props) {
     return () => window.removeEventListener("popstate", applyFromPath);
   }, []);
 
-  // The map lives at the bottom of the Home page; Leaflet mis-measures its
-  // container while a panel is hidden, so refresh it whenever Home is shown.
-  useEffect(() => {
-    if (activeTab !== "home") return;
-    const id = window.setTimeout(() => window.__spRefreshMap?.(), 60);
-    return () => window.clearTimeout(id);
-  }, [activeTab]);
-
   // Pass `scrollToId` to open the Home tab and smooth-scroll to a section on it.
   const selectTab = (id, scrollToId) => {
     setActiveTab(id);
@@ -175,14 +167,6 @@ export default function Home(props) {
         <link
           href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Nunito+Sans:wght@300;400;600;700&display=swap"
           rel="stylesheet"
-        />
-
-        {/* Leaflet (interactive map) styles */}
-        <link
-          rel="stylesheet"
-          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-          crossOrigin="anonymous"
         />
 
         {/* Existing site styles (kept as a plain stylesheet so the CSS url()
@@ -282,9 +266,9 @@ export default function Home(props) {
           {/* ===================== OFFERINGS (part of Home, Tina-editable) ===================== */}
           <section id="offerings" className="section services">
             <div className="container">
-              <div className="section__head">
-                <p className="section__eyebrow" data-tina-field={tinaField(services, "eyebrow")}>{services.eyebrow}</p>
-                <h2 className="section__title" data-tina-field={tinaField(services, "title")}>{services.title}</h2>
+            <div className="section__head">
+              <p className="section__eyebrow" data-tina-field={tinaField(contact, "eyebrow")}>{contact.eyebrow}</p>
+              <h2 className="section__title" data-tina-field={tinaField(contact, "title")}>{contact.title}</h2>
                 <p className="section__lead" data-tina-field={tinaField(services, "lead")}>
                   {services.lead}
                 </p>
@@ -436,7 +420,9 @@ export default function Home(props) {
         <section id="contact" className="section contact" hidden={activeTab !== "home"}>
           <div className="container">
             <div className="section__head">
-              <p className="section__eyebrow" data-tina-field={tinaField(contact, "eyebrow")}>{contact.eyebrow}</p>
+              {contact.eyebrow && (
+                <p className="section__eyebrow" data-tina-field={tinaField(contact, "eyebrow")}>{contact.eyebrow}</p>
+              )}
               <h2 className="section__title" data-tina-field={tinaField(contact, "title")}>{contact.title}</h2>
               <p className="section__lead" data-tina-field={tinaField(contact, "lead")}>
                 {contact.lead}
@@ -462,54 +448,34 @@ export default function Home(props) {
                     <a href={`mailto:${contact.email}`} data-tina-field={tinaField(contact, "email")}>{contact.email}</a>
                   </li>
                 </ul>
+              </div>
 
-                <h3 className="contact__subtitle" data-tina-field={tinaField(contact, "locationsTitle")}>{contact.locationsTitle}</h3>
-                {contact.locations?.map((loc, i) => (
-                  <address className="contact__location" key={i} data-tina-field={tinaField(loc)}>
-                    <strong>{loc.name}</strong><br />
-                    {loc.addressLines?.map((line, j) => (
-                      <span key={j}>{line}<br /></span>
-                    ))}
-                  </address>
-                ))}
+              <div className="contact__pricing">
+                <h3 className="contact__subtitle" data-tina-field={tinaField(contact, "pricingTitle")}>{contact.pricingTitle}</h3>
+                <p className="contact__price" data-tina-field={tinaField(contact, "pricingSingle")}>
+                  {contact.pricingSingle}
+                </p>
+                <p className="contact__price">
+                  <span data-tina-field={tinaField(contact, "pricingReduced")}>{contact.pricingReduced}</span>
+                  <br />
+                  <em data-tina-field={tinaField(contact, "pricingReducedNote")}>{contact.pricingReducedNote}</em>
+                </p>
               </div>
 
               <div className="contact__schedule">
-                <h3 className="contact__subtitle" data-tina-field={tinaField(contact, "scheduleTitle")}>{contact.scheduleTitle}</h3>
-                <table className="schedule">
-                  <thead>
-                    <tr>
-                      <th scope="col">Day</th>
-                      <th scope="col">Hours</th>
-                      <th scope="col">Location</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {contact.schedule?.map((row, i) => {
-                      const closed = /closed|appointment/i.test(row.hours || "");
-                      return (
-                        <tr key={i} data-tina-field={tinaField(row)}>
-                          <th scope="row">{row.day}</th>
-                          <td className={closed ? "schedule__closed" : undefined}>{row.hours}</td>
-                          <td>{row.location}</td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-                <p className="contact__note" data-tina-field={tinaField(contact, "scheduleNote")}>
-                  <em>{contact.scheduleNote}</em>
+                <h3 className="contact__subtitle" data-tina-field={tinaField(contact, "bookingTitle")}>{contact.bookingTitle}</h3>
+                <p>
+                  For treatments in Leiden, please contact me via{" "}
+                  <a href={`https://wa.me/${waNumber(contact.phone)}`} target="_blank" rel="noopener noreferrer">WhatsApp</a>{" "}
+                  or <a href={`mailto:${contact.email}`}>Email</a> for scheduling and availability.
                 </p>
+                <p>
+                  For treatments in Amsterdam, please refer to{" "}
+                  <a href={contact.integrationRoomUrl} target="_blank" rel="noopener noreferrer" data-tina-field={tinaField(contact, "integrationRoomUrl")}>The Integration Room</a>{" "}
+                  website for their updated booking and pricing.
+                </p>
+                <p data-tina-field={tinaField(contact, "bookingHomeNote")}><em>{contact.bookingHomeNote}</em></p>
               </div>
-            </div>
-
-            <div className="contact__map-wrap">
-              <h3 className="contact__subtitle" data-tina-field={tinaField(contact, "mapTitle")}>{contact.mapTitle}</h3>
-              <div id="map" className="contact__map" role="application" aria-label="Map showing the two Amsterdam session locations"></div>
-              <p className="contact__map-legend">
-                <span className="legend__pin legend__pin--green"></span> {contact.locations?.[0]?.name}
-                <span className="legend__pin legend__pin--violet"></span> {contact.locations?.[1]?.name}
-              </p>
             </div>
           </div>
         </section>
@@ -522,26 +488,13 @@ export default function Home(props) {
             <img src={`${PREFIX}/static/logo/soul-pathways-logo.svg`} alt="" className="site-footer__logo" />
             <span>Soul Pathways</span>
           </div>
-          <p className="site-footer__tag">Reiki &amp; Soul Healing · Amsterdam</p>
-          <p className="site-footer__copy">© <span id="year"></span> Soul Pathways. All rights reserved.</p>
+          <p className="site-footer__tag">KVK number: 98665723 | Leiden, Netherlands</p>
+          <p className="site-footer__copy">© 2026 Soul Pathways Therapy. All rights reserved.</p>
         </div>
       </footer>
 
       {/* Existing site scripts (nav toggle + footer year). */}
       <Script src={`${PREFIX}/js/main.js`} strategy="afterInteractive" />
-
-      {/* Leaflet first, then map.js (which depends on the global L). */}
-      <Script
-        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-        crossOrigin="anonymous"
-        strategy="afterInteractive"
-        onLoad={() => {
-          const s = document.createElement("script");
-          s.src = `${PREFIX}/js/map.js`;
-          document.body.appendChild(s);
-        }}
-      />
     </>
   );
 }
