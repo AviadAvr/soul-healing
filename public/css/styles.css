@@ -606,6 +606,21 @@ h3 {
     flex-direction: column;
 }
 
+/* WhatsApp link with brand-green glyph */
+.contact__wa {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    width: fit-content;
+}
+
+.contact__wa-icon {
+    width: 18px;
+    height: 18px;
+    color: #25d366;
+    flex-shrink: 0;
+}
+
 .contact__label {
     text-transform: uppercase;
     letter-spacing: 0.16em;
