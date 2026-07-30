@@ -21,8 +21,14 @@ const currentSegment = () => {
   return p.replace(/^\/+|\/+$/g, "");
 };
 
-// WhatsApp deep-link needs digits only (country code kept, "(0)" trunk dropped).
-const waNumber = (phone) => (phone || "").replace(/\(0\)/g, "").replace(/\D/g, "");
+// Normalise a display phone (e.g. "(+31) 06-4497-4792") to an international
+// dial string ("+31644974792"): keep digits & "+", then drop the trunk "0"
+// that sits right after the country code.
+const dialNumber = (phone) =>
+  (phone || "").replace(/[^\d+]/g, "").replace(/^(\+\d{1,3})0/, "$1");
+
+// WhatsApp deep-link needs digits only (no leading "+").
+const waNumber = (phone) => dialNumber(phone).replace(/\D/g, "");
 
 // The single-page site is organised as tabs; only one panel is visible at a time.
 // Offerings (services) and Contact both live at the bottom of the Home panel;
@@ -72,14 +78,6 @@ export default function Home(props) {
     window.addEventListener("popstate", applyFromPath); // browser back / forward
     return () => window.removeEventListener("popstate", applyFromPath);
   }, []);
-
-  // The map lives at the bottom of the Home page; Leaflet mis-measures its
-  // container while a panel is hidden, so refresh it whenever Home is shown.
-  useEffect(() => {
-    if (activeTab !== "home") return;
-    const id = window.setTimeout(() => window.__spRefreshMap?.(), 60);
-    return () => window.clearTimeout(id);
-  }, [activeTab]);
 
   // Pass `scrollToId` to open the Home tab and smooth-scroll to a section on it.
   const selectTab = (id, scrollToId) => {
@@ -175,14 +173,6 @@ export default function Home(props) {
         <link
           href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Nunito+Sans:wght@300;400;600;700&display=swap"
           rel="stylesheet"
-        />
-
-        {/* Leaflet (interactive map) styles */}
-        <link
-          rel="stylesheet"
-          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-          crossOrigin="anonymous"
         />
 
         {/* Existing site styles (kept as a plain stylesheet so the CSS url()
@@ -282,9 +272,9 @@ export default function Home(props) {
           {/* ===================== OFFERINGS (part of Home, Tina-editable) ===================== */}
           <section id="offerings" className="section services">
             <div className="container">
-              <div className="section__head">
-                <p className="section__eyebrow" data-tina-field={tinaField(services, "eyebrow")}>{services.eyebrow}</p>
-                <h2 className="section__title" data-tina-field={tinaField(services, "title")}>{services.title}</h2>
+            <div className="section__head">
+              <p className="section__eyebrow" data-tina-field={tinaField(contact, "eyebrow")}>{contact.eyebrow}</p>
+              <h2 className="section__title" data-tina-field={tinaField(contact, "title")}>{contact.title}</h2>
                 <p className="section__lead" data-tina-field={tinaField(services, "lead")}>
                   {services.lead}
                 </p>
@@ -436,7 +426,9 @@ export default function Home(props) {
         <section id="contact" className="section contact" hidden={activeTab !== "home"}>
           <div className="container">
             <div className="section__head">
-              <p className="section__eyebrow" data-tina-field={tinaField(contact, "eyebrow")}>{contact.eyebrow}</p>
+              {contact.eyebrow && (
+                <p className="section__eyebrow" data-tina-field={tinaField(contact, "eyebrow")}>{contact.eyebrow}</p>
+              )}
               <h2 className="section__title" data-tina-field={tinaField(contact, "title")}>{contact.title}</h2>
               <p className="section__lead" data-tina-field={tinaField(contact, "lead")}>
                 {contact.lead}
@@ -448,71 +440,48 @@ export default function Home(props) {
                 <h3 className="contact__subtitle" data-tina-field={tinaField(contact, "detailsTitle")}>{contact.detailsTitle}</h3>
                 <ul className="contact__list">
                   <li>
-                    <span className="contact__label">WhatsApp</span>
+                    <span className="contact__label">Phone</span>
+                    <a href={`tel:${dialNumber(contact.phone)}`} data-tina-field={tinaField(contact, "phone")}>Tel: {contact.phone}</a>
                     <a href={`https://wa.me/${waNumber(contact.phone)}`} target="_blank" rel="noopener noreferrer" className="contact__wa" data-tina-field={tinaField(contact, "phone")}>
                       <svg className="contact__wa-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                         <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.148-.669-1.611-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
                       </svg>
-                      Chat on WhatsApp
+                      WhatsApp
                     </a>
-                  </li>
-                  <li>
-                    <span className="contact__label">Phone</span>
-                    <a href={`tel:${(contact.phone || "").replace(/[^+\d]/g, "")}`} data-tina-field={tinaField(contact, "phone")}>{contact.phone}</a>
                   </li>
                   <li>
                     <span className="contact__label">Email</span>
                     <a href={`mailto:${contact.email}`} data-tina-field={tinaField(contact, "email")}>{contact.email}</a>
                   </li>
                 </ul>
+              </div>
 
-                <h3 className="contact__subtitle" data-tina-field={tinaField(contact, "locationsTitle")}>{contact.locationsTitle}</h3>
-                {contact.locations?.map((loc, i) => (
-                  <address className="contact__location" key={i} data-tina-field={tinaField(loc)}>
-                    <strong>{loc.name}</strong><br />
-                    {loc.addressLines?.map((line, j) => (
-                      <span key={j}>{line}<br /></span>
-                    ))}
-                  </address>
-                ))}
+              <div className="contact__pricing">
+                <h3 className="contact__subtitle" data-tina-field={tinaField(contact, "pricingTitle")}>{contact.pricingTitle}</h3>
+                <p className="contact__price" data-tina-field={tinaField(contact, "pricingSingle")}>
+                  {contact.pricingSingle}
+                </p>
+                <p className="contact__price">
+                  <span data-tina-field={tinaField(contact, "pricingReduced")}>{contact.pricingReduced}</span>
+                  <br />
+                  <em data-tina-field={tinaField(contact, "pricingReducedNote")}>{contact.pricingReducedNote}</em>
+                </p>
               </div>
 
               <div className="contact__schedule">
-                <h3 className="contact__subtitle" data-tina-field={tinaField(contact, "scheduleTitle")}>{contact.scheduleTitle}</h3>
-                <table className="schedule">
-                  <thead>
-                    <tr>
-                      <th scope="col">Day</th>
-                      <th scope="col">Hours</th>
-                      <th scope="col">Location</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {contact.schedule?.map((row, i) => {
-                      const closed = /closed|appointment/i.test(row.hours || "");
-                      return (
-                        <tr key={i} data-tina-field={tinaField(row)}>
-                          <th scope="row">{row.day}</th>
-                          <td className={closed ? "schedule__closed" : undefined}>{row.hours}</td>
-                          <td>{row.location}</td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-                <p className="contact__note" data-tina-field={tinaField(contact, "scheduleNote")}>
-                  <em>{contact.scheduleNote}</em>
+                <h3 className="contact__subtitle" data-tina-field={tinaField(contact, "bookingTitle")}>{contact.bookingTitle}</h3>
+                <p>
+                  For treatments in Leiden, please contact me via{" "}
+                  <a href={`https://wa.me/${waNumber(contact.phone)}`} target="_blank" rel="noopener noreferrer">WhatsApp</a>{" "}
+                  or <a href={`mailto:${contact.email}`}>Email</a> for scheduling and availability.
                 </p>
+                <p>
+                  For treatments in Amsterdam, please refer to{" "}
+                  <a href={contact.integrationRoomUrl} target="_blank" rel="noopener noreferrer" data-tina-field={tinaField(contact, "integrationRoomUrl")}>The Integration Room</a>{" "}
+                  website for their updated booking and pricing.
+                </p>
+                <p data-tina-field={tinaField(contact, "bookingHomeNote")}><em>{contact.bookingHomeNote}</em></p>
               </div>
-            </div>
-
-            <div className="contact__map-wrap">
-              <h3 className="contact__subtitle" data-tina-field={tinaField(contact, "mapTitle")}>{contact.mapTitle}</h3>
-              <div id="map" className="contact__map" role="application" aria-label="Map showing the two Amsterdam session locations"></div>
-              <p className="contact__map-legend">
-                <span className="legend__pin legend__pin--green"></span> {contact.locations?.[0]?.name}
-                <span className="legend__pin legend__pin--violet"></span> {contact.locations?.[1]?.name}
-              </p>
             </div>
           </div>
         </section>
@@ -525,26 +494,13 @@ export default function Home(props) {
             <img src={`${PREFIX}/static/logo/soul-pathways-logo.svg`} alt="" className="site-footer__logo" />
             <span>Soul Pathways</span>
           </div>
-          <p className="site-footer__tag">Reiki &amp; Soul Healing · Amsterdam</p>
-          <p className="site-footer__copy">© <span id="year"></span> Soul Pathways. All rights reserved.</p>
+          <p className="site-footer__tag">KVK number: 98665723 | Leiden, Netherlands</p>
+          <p className="site-footer__copy">© 2026 Soul Pathways Therapy. All rights reserved.</p>
         </div>
       </footer>
 
       {/* Existing site scripts (nav toggle + footer year). */}
       <Script src={`${PREFIX}/js/main.js`} strategy="afterInteractive" />
-
-      {/* Leaflet first, then map.js (which depends on the global L). */}
-      <Script
-        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-        crossOrigin="anonymous"
-        strategy="afterInteractive"
-        onLoad={() => {
-          const s = document.createElement("script");
-          s.src = `${PREFIX}/js/map.js`;
-          document.body.appendChild(s);
-        }}
-      />
     </>
   );
 }
