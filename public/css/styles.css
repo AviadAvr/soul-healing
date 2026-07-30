@@ -648,6 +648,60 @@ h3 {
     color: var(--c-ink-soft);
 }
 
+/* Email "copy to clipboard" button — looks like the other contact links. */
+.contact__copy {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0;
+    background: none;
+    border: 0;
+    font: inherit;
+    color: var(--c-sage-dark);
+    cursor: pointer;
+    width: fit-content;
+    text-align: left;
+}
+
+.contact__copy:hover {
+    color: var(--c-ink);
+}
+
+/* Match the email's hover cue on the phone & WhatsApp links so they read as
+   actionable too. */
+.contact__tel-row a:hover,
+.contact__wa:hover {
+    color: var(--c-ink);
+}
+
+/* Slide-in toast confirming the copy. */
+.toast {
+    position: fixed;
+    left: 50%;
+    bottom: 24px;
+    transform: translate(-50%, 20px);
+    z-index: 1000;
+    background: var(--c-ink);
+    color: #fff;
+    font-size: 0.92rem;
+    font-weight: 600;
+    padding: 12px 20px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-md);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.toast.is-visible {
+    opacity: 1;
+    transform: translate(-50%, 0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .toast { transition: opacity 0.2s ease; }
+}
+
 .contact__location {
     font-style: normal;
     color: var(--c-ink-soft);
