@@ -667,9 +667,17 @@ h3 {
     color: var(--c-ink);
 }
 
-/* Match the email's hover cue on the phone & WhatsApp links so they read as
-   actionable too. */
-.contact__tel-row a:hover,
+/* Phone & email actions (copy button on desktop, tel/mailto link on mobile).
+   The wrapper shrinks to its content so the click area matches the text, not
+   the full column width. */
+.contact__action {
+    display: block;
+    width: fit-content;
+}
+
+/* Match the email's hover cue on the phone/email links & WhatsApp so they read
+   as actionable too. */
+.contact__action a:hover,
 .contact__wa:hover {
     color: var(--c-ink);
 }
