@@ -60,9 +60,10 @@ export default function Home(props) {
   const [activeTab, setActiveTab] = useState("home");
 
   // ── "Copied to clipboard" toast ───────────────────────────────────
-  // Holds the label of whatever was last copied (e.g. "Email address"), or
-  // null when the toast is hidden.
-  const [copiedLabel, setCopiedLabel] = useState(null);
+  // `label` is the message text (e.g. "Email address"); `visible` drives the
+  // fade in/out. Keeping the label while hiding avoids a flash of bare
+  // "copied to clipboard" text during the fade-out.
+  const [toast, setToast] = useState({ label: "", visible: false });
 
   // On touch/mobile devices the email/phone open the mail/dialer app; on
   // desktop they copy to the clipboard instead. Default to desktop for SSR,
@@ -93,8 +94,8 @@ export default function Home(props) {
         document.execCommand("copy");
         document.body.removeChild(ta);
       }
-      setCopiedLabel(label);
-      window.setTimeout(() => setCopiedLabel(null), 2200);
+      setToast({ label, visible: true });
+      window.setTimeout(() => setToast((t) => ({ ...t, visible: false })), 2200);
     } catch {
       // Clipboard blocked — leave silently.
     }
@@ -559,11 +560,11 @@ export default function Home(props) {
 
       {/* "Copied to clipboard" toast — announced politely for screen readers. */}
       <div
-        className={`toast${copiedLabel ? " is-visible" : ""}`}
+        className={`toast${toast.visible ? " is-visible" : ""}`}
         role="status"
         aria-live="polite"
       >
-        {copiedLabel} copied to clipboard
+        {toast.label && `${toast.label} copied to clipboard`}
       </div>
 
       {/* ===================== FOOTER ===================== */}
