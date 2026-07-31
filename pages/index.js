@@ -31,7 +31,7 @@ const dialNumber = (phone) =>
 const waNumber = (phone) => dialNumber(phone).replace(/\D/g, "");
 
 // The single-page site is organised as tabs; only one panel is visible at a time.
-// Offerings (services) and Contact both live at the bottom of the Home panel;
+// Services and Contact both live at the bottom of the Home panel;
 // "reiki"/"soul-healing" are their own tabs.
 const TABS = ["home", "about", "reiki", "soul-healing"];
 
@@ -39,7 +39,7 @@ const TABS = ["home", "about", "reiki", "soul-healing"];
 const SERVICE_TABS = ["reiki", "soul-healing"];
 
 // In-page sections at the bottom of Home (reached by switching to Home + scroll).
-const HOME_SECTIONS = ["offerings", "contact"];
+const HOME_SECTIONS = ["services", "contact"];
 
 export default function Home(props) {
   // useTina makes the content live-editable inside the Tina admin iframe.
@@ -253,15 +253,15 @@ export default function Home(props) {
           <ul className="nav__menu" id="navMenu" role="tablist" aria-label="Site sections">
             <li><a {...linkProps("home")} className={`nav__link${activeTab === "home" ? " is-active" : ""}`}>Home</a></li>
 
-            {/* Offerings — hover dropdown on desktop */}
+            {/* Services — hover dropdown on desktop */}
             <li className="nav__item nav__has-dropdown">
               <a
-                href={pathFor("offerings")}
+                href={pathFor("services")}
                 className={`nav__link nav__dropdown-toggle${activeTab === "reiki" || activeTab === "soul-healing" ? " is-active" : ""}`}
                 aria-haspopup="true"
-                onClick={(e) => { e.preventDefault(); selectTab("home", "offerings"); }}
+                onClick={(e) => { e.preventDefault(); selectTab("home", "services"); }}
               >
-                Offerings <span className="nav__caret" aria-hidden="true">▾</span>
+                Services <span className="nav__caret" aria-hidden="true">▾</span>
               </a>
               <ul className="nav__dropdown">
                 <li><a {...linkProps("reiki")} className={`nav__dropdown-link${activeTab === "reiki" ? " is-active" : ""}`}>Reiki</a></li>
@@ -314,12 +314,12 @@ export default function Home(props) {
           </div>
           </section>
 
-          {/* ===================== OFFERINGS (part of Home, Tina-editable) ===================== */}
-          <section id="offerings" className="section services">
+          {/* ===================== SERVICES (part of Home, Tina-editable) ===================== */}
+          <section id="services" className="section services">
             <div className="container">
             <div className="section__head">
-              <p className="section__eyebrow" data-tina-field={tinaField(contact, "eyebrow")}>{contact.eyebrow}</p>
-              <h2 className="section__title" data-tina-field={tinaField(contact, "title")}>{contact.title}</h2>
+              <p className="section__eyebrow" data-tina-field={tinaField(contact, "eyebrow")}>{services.eyebrow}</p>
+              <h2 className="section__title" data-tina-field={tinaField(contact, "title")}>{services.title}</h2>
                 <p className="section__lead" data-tina-field={tinaField(services, "lead")}>
                   {services.lead}
                 </p>
@@ -546,7 +546,15 @@ export default function Home(props) {
                 <p>
                   For treatments in Leiden, please contact me via{" "}
                   <a href={`https://wa.me/${waNumber(contact.phone)}`} target="_blank" rel="noopener noreferrer">WhatsApp</a>{" "}
-                  or <a href={`mailto:${contact.email}`}>Email</a> for scheduling and availability.
+                  or{" "}
+                  {isTouchDevice ? (
+                    <a href={`mailto:${contact.email}`}>Email</a>
+                  ) : (
+                    <button type="button" className="contact__copy contact__copy--inline" onClick={copyEmail} aria-label={`Copy email address ${contact.email} to clipboard`}>
+                      Email
+                    </button>
+                  )}{" "}
+                  for scheduling and availability.
                 </p>
                 <p>
                   For treatments in Amsterdam, please refer to{" "}
@@ -576,8 +584,9 @@ export default function Home(props) {
             <img src={`${PREFIX}/static/logo/soul-pathways-logo.svg`} alt="" className="site-footer__logo" />
             <span>Soul Pathways</span>
           </div>
-          <p className="site-footer__tag">KVK number: 98665723 | Leiden, Netherlands</p>
-          <p className="site-footer__copy">© 2026 Soul Pathways Therapy. All rights reserved.</p>
+          <p className="site-footer__tag">Reiki & Soul Healing</p>
+          <p className="site-footer__copy-top">© 2026 Soul Pathways Therapy. All rights reserved.</p>
+          <p className="site-footer__copy-bottom">KVK number: 98665723 | Leiden, Netherlands</p>
         </div>
       </footer>
 

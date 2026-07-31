@@ -22,6 +22,14 @@
                 toggle.setAttribute("aria-expanded", "false");
             }
         });
+
+        // Close the menu when clicking/tapping anywhere outside it (mobile)
+        document.addEventListener("click", function (e) {
+            if (!menu.classList.contains("is-open")) return;
+            if (menu.contains(e.target) || toggle.contains(e.target)) return;
+            menu.classList.remove("is-open");
+            toggle.setAttribute("aria-expanded", "false");
+        });
     }
 
     // --- Current year in footer ---

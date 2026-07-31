@@ -134,7 +134,7 @@ h3 {
 .nav__brand {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 5px;
     color: var(--c-ink);
 }
 
@@ -191,7 +191,7 @@ h3 {
     color: #fff;
 }
 
-/* Offerings dropdown (desktop hover menu) */
+/* Services dropdown (desktop hover menu) */
 .nav__has-dropdown {
     position: relative;
 }
@@ -734,15 +734,24 @@ h3 {
 
 /* Inline links inside the booking text — made obvious so people know they're
    clickable (the global <a> resets text-decoration off). */
-.contact__schedule p a {
+.contact__schedule p a,
+.contact__schedule p .contact__copy--inline {
     color: var(--c-sage-dark);
     font-weight: 700;
     transition: color 0.15s ease;
 }
 
 .contact__schedule p a:hover,
-.contact__schedule p a:focus-visible {
+.contact__schedule p a:focus-visible,
+.contact__schedule p .contact__copy--inline:hover,
+.contact__schedule p .contact__copy--inline:focus-visible {
     color: var(--c-ink);
+}
+
+/* Inline copy button in the booking text — sit inline like a link. */
+.contact__copy--inline {
+    display: inline;
+    vertical-align: baseline;
 }
 
 /* Schedule table */
@@ -912,7 +921,7 @@ h3 {
 .site-footer__brand {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 5px;
     font-family: var(--font-display);
     font-size: 1.4rem;
     color: #fff;
@@ -930,7 +939,7 @@ h3 {
     font-size: 0.9rem;
 }
 
-.site-footer__copy {
+.site-footer__copy-top, .site-footer__copy-bottom {
     margin: 6px 0 0;
     font-size: 0.82rem;
     color: rgba(255, 255, 255, 0.55);
@@ -942,7 +951,7 @@ h3 {
         display: flex;
     }
 
-    /* Swap the Offerings hover menu for direct links on touch/small screens. */
+    /* Swap the Services hover menu for direct links on touch/small screens. */
     .nav__has-dropdown {
         display: none;
     }
