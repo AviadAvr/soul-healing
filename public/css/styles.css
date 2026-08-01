@@ -491,6 +491,18 @@ h3 {
     gap: 12px;
 }
 
+/* Two copies exist in the markup so the list can sit under the photo on wide
+   screens but beneath the paragraphs on mobile. Only one shows per breakpoint. */
+.about__highlights--inText {
+    display: none;
+}
+
+.about__highlights--onMedia {
+    width: fit-content;
+    max-width: 100%;
+    margin: 1.8em auto 0;
+}
+
 .about__highlights li {
     position: relative;
     padding-left: 30px;
@@ -996,6 +1008,15 @@ h3 {
     .about__grid,
     .contact__grid {
         grid-template-columns: 1fr;
+    }
+
+    /* Flip which highlights copy is visible: beneath the paragraphs on mobile. */
+    .about__highlights--onMedia {
+        display: none;
+    }
+
+    .about__highlights--inText {
+        display: grid;
     }
 
     .contact__grid {

@@ -362,6 +362,12 @@ export default function Home(props) {
           <div className="container about__grid">
             <div className="about__media">
               <img src={`${PREFIX}/static/images/about-1.jpg`} alt="Portrait of the practitioner — placeholder" className="about__photo about__photo--main" />
+              {/* Wide screens: highlights sit under the photo. Hidden on mobile (see CSS). */}
+              <ul className="about__highlights about__highlights--onMedia" data-tina-field={tinaField(about, "highlights")}>
+                {about.highlights?.map((item, i) => (
+                  <li key={i}>{withEmphasis(item)}</li>
+                ))}
+              </ul>
             </div>
 
             <div className="about__text">
@@ -378,7 +384,8 @@ export default function Home(props) {
                 ))}
               </div>
 
-              <ul className="about__highlights" data-tina-field={tinaField(about, "highlights")}>
+              {/* Mobile: highlights sit beneath the paragraphs. Hidden on wide screens (see CSS). */}
+              <ul className="about__highlights about__highlights--inText" data-tina-field={tinaField(about, "highlights")}>
                 {about.highlights?.map((item, i) => (
                   <li key={i}>{withEmphasis(item)}</li>
                 ))}
