@@ -27,6 +27,13 @@ const currentSegment = () => {
 const dialNumber = (phone) =>
   (phone || "").replace(/[^\d+]/g, "").replace(/^(\+\d{1,3})0/, "$1");
 
+// Lightweight inline emphasis: turn *starred* spans into <em> without allowing
+// raw HTML. Keeps content editable (plain text) in the Tina/JSON editor.
+const withEmphasis = (text) =>
+  (text || "").split(/\*([^*]+)\*/g).map((chunk, i) =>
+    i % 2 === 1 ? <em key={i}>{chunk}</em> : chunk
+  );
+
 // WhatsApp deep-link needs digits only (no leading "+").
 const waNumber = (phone) => dialNumber(phone).replace(/\D/g, "");
 
@@ -355,7 +362,6 @@ export default function Home(props) {
           <div className="container about__grid">
             <div className="about__media">
               <img src={`${PREFIX}/static/images/about-1.jpg`} alt="Portrait of the practitioner — placeholder" className="about__photo about__photo--main" />
-              <img src={`${PREFIX}/static/images/about-2.svg`} alt="Healing space — placeholder" className="about__photo about__photo--accent" />
             </div>
 
             <div className="about__text">
@@ -367,14 +373,14 @@ export default function Home(props) {
               </h2>
 
               <div data-tina-field={tinaField(about, "paragraphs")}>
-                {about.paragraphs?.map((para, i) => (
-                  <p key={i}>{para}</p>
+                {(about.paragraphs?.flatMap((para) => para.split(/\n{2,}/)) ?? []).map((para, i) => (
+                  <p key={i}>{withEmphasis(para)}</p>
                 ))}
               </div>
 
               <ul className="about__highlights" data-tina-field={tinaField(about, "highlights")}>
                 {about.highlights?.map((item, i) => (
-                  <li key={i}>{item}</li>
+                  <li key={i}>{withEmphasis(item)}</li>
                 ))}
               </ul>
 

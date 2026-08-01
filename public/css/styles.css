@@ -471,18 +471,12 @@ h3 {
 }
 
 .about__photo--main {
-    width: 78%;
+    width: 70%;
+    max-width: 340px;
+    margin-inline: auto;
     aspect-ratio: 3 / 4;
 }
 
-.about__photo--accent {
-    position: absolute;
-    right: 0;
-    bottom: -28px;
-    width: 46%;
-    aspect-ratio: 1 / 1;
-    border: 6px solid var(--c-bg);
-}
 
 .about__text p {
     color: var(--c-ink-soft);
@@ -505,9 +499,14 @@ h3 {
 }
 
 .about__highlights li::before {
-    content: "✦";
+    content: "࿔";
     position: absolute;
     left: 0;
+    top: -0.8em;
+    font-size: 1.5em;
+    transform: scale(2.5);
+    transform-origin: left center;
+    font-weight: 400;
     color: var(--c-sage);
 }
 
@@ -1012,9 +1011,6 @@ h3 {
         margin-inline: auto;
     }
 
-    .about__photo--accent {
-        bottom: -18px;
-    }
 
     .services__grid {
         grid-template-columns: 1fr;
