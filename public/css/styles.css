@@ -511,14 +511,9 @@ h3 {
 }
 
 .about__highlights li::before {
-    content: "࿔";
+    content: "✦";
     position: absolute;
     left: 0;
-    top: -0.8em;
-    font-size: 1.5em;
-    transform: scale(2.5);
-    transform-origin: left center;
-    font-weight: 400;
     color: var(--c-sage);
 }
 
