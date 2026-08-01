@@ -846,6 +846,14 @@ h3 {
     margin: 0 0 1.1em;
 }
 
+/* Italic gloss that acts as an "in-between" subtitle: sits close under the
+   heading, with a clear gap before the paragraph that follows.
+   Scoped under .service-page__body so it out-specifies `.service-page__body p`. */
+.service-page__body .service-page__gloss {
+    margin: -0.1em 0 0.4em;
+    color: var(--c-ink);
+}
+
 .service-page__body .btn {
     margin-top: 20px;
 }

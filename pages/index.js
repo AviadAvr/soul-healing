@@ -402,35 +402,58 @@ export default function Home(props) {
         <section {...panelProps("reiki", "section service-page")}>
           <div className="container">
             <div className="section__head">
-              <p className="section__eyebrow">Energy Healing</p>
+              <p className="section__eyebrow">Rest & Replenish</p>
               <h2 className="section__title">Reiki</h2>
               <p className="section__lead">
-                A gentle, hands-on (or hands-near) Japanese energy technique that
-                encourages deep relaxation and supports your body&apos;s natural balance.
+                Healing is a process in which deeper layers are resolved with each treatment.
+                It is highly recommended to allow for at least four Reiki sessions.
+                That said, even a single treatment can bring profound relief and you are welcome to come for one-off sessions as well.
               </p>
             </div>
 
             <div className="service-page__body">
-              <p>
-                <em>Placeholder text — your Reiki page copy will go here.</em>
-              </p>
               <h3>What is Reiki?</h3>
               <p>
-                Reiki is a calming practice in which the practitioner channels
-                universal life energy to help ease tension and restore a sense of
-                harmony. Describe your approach, lineage, and philosophy here.
+               Reiki is a method for working with the body’s energy system to stimulate its natural healing abilities,
+                established in Japan in 1922 by Mikao Usui. The word Reiki (霊 Rei–spirit; 気 Ki–energy, life force) describes
+                the universal energy that flows through all life and matter, which we work with during the treatment.
+                A Reiki treatment is the process of receiving and letting this energy flow from the “天 Ten”
+                (universe, heavens, cosmos) through the practitioner and to the patient,
+                assisting and enhancing the body’s inherent capacity to heal.
               </p>
-              <h3>What a session feels like</h3>
+              <h3>What is a Reiki Session Like?</h3>
               <p>
-                You remain fully clothed and comfortable while gentle hand
-                positions guide the flow of energy. Many people feel warmth,
-                tingling, and deep calm. Add what clients can expect here.
+                Receiving Reiki is a deeply restful and restorative experience.
+                You remain fully clothed and lie on a treatment table while Reiki is applied through
+                gentle touch. Of course, if you prefer not to be touched,
+                this is completely respected and Reiki can be offered just above the body.
               </p>
-              <h3>Who it&apos;s for</h3>
+              <h3>My Approach</h3>
               <p>
-                Reiki can support stress relief, emotional balance, better rest,
-                and general wellbeing. Outline who benefits most and any details
-                to keep in mind before a session.
+                My therapeutic work is rooted in the belief that healing is an embodied process
+                integrating the emotional, mental and physical self. My intention is to offer
+                a nurturing, trauma-informed space that allows you to meet yourself with compassion
+                and acceptance of your emotional and somatic experiences that may arise during the
+                treatment. My work with Reiki is grounded and deeply attuned to your body&apos;s
+                energy system. By assisting your body&apos;s inherent healing ability,
+                we create a safe space for you to release energetic and emotional blockages,
+                allowing your body&apos;s natural intelligence to replenish its energy stores.
+              </p>
+              <h3>Reiki Jin Kei Do</h3>
+              <p className="service-page__gloss">
+                <em>Jin–compassion; Kei–wisdom; Do–way, path</em>
+              </p>
+              <p>
+                I trained in a Reiki lineage called Jin Kei Do,
+                the path of compassion and wisdom, passed from Mikao Usui,
+                Dr Chujiro Hayashi, Venerable Takeuchi, Venerable Seiji Takamori,
+                Dr Ranga Premaratna and Edith Anny Izsak.
+                This path, influenced by the principles of Zen monks Takeuchi and Takamori,
+                and further deepened by Takamori&apos;s immersion in Tibetan Buddhism,
+                emphasises personal cultivation to bring harmony and connection of the heart
+                (compassion) and mind (wisdom). This growth is cultivated through meditation,
+                various Qigong exercises (Qi is the Chinese equivalent to the Japanese word Ki)
+                and mindful integration of these principles in one&apos;s life.
               </p>
               <a href={pathFor("contact")} className="btn btn--primary" onClick={(e) => { e.preventDefault(); selectTab("home", "contact"); }}>
                 Book a session
