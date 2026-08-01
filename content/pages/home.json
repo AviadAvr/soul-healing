@@ -4,21 +4,21 @@
     "titleLine1": "Back in touch",
     "titleLine2": "with your Self",
     "subtitle": "Reconnect with a deeper sense of balance, presence and wellbeing in your life. Healing releases what has long been held within, restoring your body’s natural alignment.",
-    "primaryCta": "Book a session",
+    "primaryCta": "Contact me",
     "secondaryCta": "About me"
   },
   "about": {
     "eyebrow": "About me",
-    "title": "A warm, safe space to heal",
+    "title": "Welcome. I'm Yonina,",
     "paragraphs": [
-      "Hello, and welcome. I'm a Reiki practitioner and soul healing guide based in Amsterdam. [This is placeholder text — share your personal story, training, and approach here.],My work is rooted in compassion, presence, and deep respect for each person's journey. Whether you're navigating stress, seeking clarity, or simply longing for a moment of stillness, my sessions offer a calm space to reconnect with yourself. [Add details about your philosophy and what clients can expect.] temp text."
+      "*A weaver of ways, integrating various practices and paths of wisdom to facilitate Healing—for people, the Earth and all beings.*\n\nDrawing upon my academic background in Clinical Psychology (MSc) and energy healing practices, my therapeutic work is rooted in the belief that healing is an embodied process integrating the emotional, mental and physical self. My intention is to offer a nurturing, trauma- informed space that allows you to meet yourself with compassion and acceptance of your emotional and somatic experiences.\n\nHaving lived in four countries with multinational grandparents, my personal journey is one of finding home within myself whilst building and nurturing strong and meaningful connections to the people, communities and land around me.\n\n*Healing is coming back home to yourself, getting in touch with and acting from a place of your authentic Being.*"
     ],
     "highlights": [
-      "Certified Reiki practitioner [edit]",
-      "Years of practice [edit]",
-      "Individual & tailored sessions"
+      "MSc Clinical Psychology | Leiden University (2025)",
+      "Reiki Jin Kei Do | first degree certification (2023)",
+      "Esoteric Soul Healing | *currently training*"
     ],
-    "cta": "Get in touch"
+    "cta": "Contact me"
   },
   "services": {
     "eyebrow": "What I offer",
@@ -40,7 +40,7 @@
   "contact": {
     "eyebrow": "Get in touch",
     "title": "Contact & Booking",
-    "lead": "Temp Text: 'Sessions are available at two welcoming locations in Amsterdam. Reach out to book, or use the weekly availability below as a guide.'",
+    "lead": "I primarily offer treatments from my home in the centre of Leiden, where my practice is based. Additionally, I have some availability at a clinic in Amsterdam.",
     "detailsTitle": "Reach out",
     "phone": "(+31) 06 4497 4792",
     "email": "hello@soulpathways.example",
@@ -49,7 +49,7 @@
     "pricingReduced": "Reduced rate: €35",
     "pricingReducedNote": "For students and those experiencing financial constraints. Please choose the rate that best reflects your current circumstances.",
     "bookingTitle": "Booking",
-    "integrationRoomUrl": "https://www.theintegrationroom.nl/",
+    "integrationRoomUrl": "https://www.theintegrationroom.nl/about-6",
     "bookingHomeNote": "Under certain circumstances, I may be able to offer treatments in your home. Reach out if this improves your access to care."
   },
   "booking": {

@@ -335,7 +335,7 @@ h3 {
     margin-inline: auto;
     padding: clamp(28px, 4vw, 48px);
     text-align: center;
-    background: rgba(31, 41, 35, 0.42);
+    background: rgb(57, 84, 68, 0.47);
     border: 1px solid rgba(255, 255, 255, 0.18);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-md);
@@ -471,18 +471,12 @@ h3 {
 }
 
 .about__photo--main {
-    width: 78%;
+    width: 80%;
+    max-width: 340px;
+    margin-inline: auto;
     aspect-ratio: 3 / 4;
 }
 
-.about__photo--accent {
-    position: absolute;
-    right: 0;
-    bottom: -28px;
-    width: 46%;
-    aspect-ratio: 1 / 1;
-    border: 6px solid var(--c-bg);
-}
 
 .about__text p {
     color: var(--c-ink-soft);
@@ -497,6 +491,18 @@ h3 {
     gap: 12px;
 }
 
+/* Two copies exist in the markup so the list can sit under the photo on wide
+   screens but beneath the paragraphs on mobile. Only one shows per breakpoint. */
+.about__highlights--inText {
+    display: none;
+}
+
+.about__highlights--onMedia {
+    width: fit-content;
+    max-width: 100%;
+    margin: 1.8em auto 0;
+}
+
 .about__highlights li {
     position: relative;
     padding-left: 30px;
@@ -505,9 +511,14 @@ h3 {
 }
 
 .about__highlights li::before {
-    content: "✦";
+    content: "࿔";
     position: absolute;
     left: 0;
+    top: -0.8em;
+    font-size: 1.5em;
+    transform: scale(2.5);
+    transform-origin: left center;
+    font-weight: 400;
     color: var(--c-sage);
 }
 
@@ -835,6 +846,14 @@ h3 {
     margin: 0 0 1.1em;
 }
 
+/* Italic gloss that acts as an "in-between" subtitle: sits close under the
+   heading, with a clear gap before the paragraph that follows.
+   Scoped under .service-page__body so it out-specifies `.service-page__body p`. */
+.service-page__body .service-page__gloss {
+    margin: -0.1em 0 0.4em;
+    color: var(--c-ink);
+}
+
 .service-page__body .btn {
     margin-top: 20px;
 }
@@ -984,7 +1003,7 @@ h3 {
 
     .nav__link {
         display: block;
-        padding: 14px 0;
+        padding: 14px 16px;
         width: 100%;
     }
 
@@ -997,6 +1016,15 @@ h3 {
     .about__grid,
     .contact__grid {
         grid-template-columns: 1fr;
+    }
+
+    /* Flip which highlights copy is visible: beneath the paragraphs on mobile. */
+    .about__highlights--onMedia {
+        display: none;
+    }
+
+    .about__highlights--inText {
+        display: grid;
     }
 
     .contact__grid {
@@ -1012,9 +1040,6 @@ h3 {
         margin-inline: auto;
     }
 
-    .about__photo--accent {
-        bottom: -18px;
-    }
 
     .services__grid {
         grid-template-columns: 1fr;
