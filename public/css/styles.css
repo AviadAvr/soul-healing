@@ -335,7 +335,7 @@ h3 {
     margin-inline: auto;
     padding: clamp(28px, 4vw, 48px);
     text-align: center;
-    background: rgba(31, 41, 35, 0.42);
+    background: rgb(57, 84, 68, 0.47);
     border: 1px solid rgba(255, 255, 255, 0.18);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-md);
@@ -471,7 +471,7 @@ h3 {
 }
 
 .about__photo--main {
-    width: 70%;
+    width: 80%;
     max-width: 340px;
     margin-inline: auto;
     aspect-ratio: 3 / 4;
