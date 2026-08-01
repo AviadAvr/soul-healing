@@ -572,7 +572,7 @@ export default function Home(props) {
                 <p>
                   For treatments in Amsterdam, please refer to{" "}
                   <a href={contact.integrationRoomUrl} target="_blank" rel="noopener noreferrer" data-tina-field={tinaField(contact, "integrationRoomUrl")}>The Integration Room</a>{" "}
-                  website for their updated booking and pricing.
+                  clinic's website for their updated pricing and booking.
                 </p>
                 <p data-tina-field={tinaField(contact, "bookingHomeNote")}><em>{contact.bookingHomeNote}</em></p>
               </div>

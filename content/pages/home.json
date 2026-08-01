@@ -40,7 +40,7 @@
   "contact": {
     "eyebrow": "Get in touch",
     "title": "Contact & Booking",
-    "lead": "Temp Text: 'Sessions are available at two welcoming locations in Amsterdam. Reach out to book, or use the weekly availability below as a guide.'",
+    "lead": "I primarily offer treatments from my home in the centre of Leiden, where my practice is based. Additionally, I have some availability at a clinic in Amsterdam.",
     "detailsTitle": "Reach out",
     "phone": "(+31) 06 4497 4792",
     "email": "hello@soulpathways.example",
@@ -49,7 +49,7 @@
     "pricingReduced": "Reduced rate: €35",
     "pricingReducedNote": "For students and those experiencing financial constraints. Please choose the rate that best reflects your current circumstances.",
     "bookingTitle": "Booking",
-    "integrationRoomUrl": "https://www.theintegrationroom.nl/",
+    "integrationRoomUrl": "https://www.theintegrationroom.nl/about-6",
     "bookingHomeNote": "Under certain circumstances, I may be able to offer treatments in your home. Reach out if this improves your access to care."
   },
   "booking": {
