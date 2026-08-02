@@ -1,6 +1,6 @@
 import Head from "next/head";
 import Script from "next/script";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTina, tinaField } from "tinacms/dist/react";
 import { client } from "../tina/__generated__/client";
 
@@ -76,6 +76,8 @@ export default function Home(props) {
   // desktop they copy to the clipboard instead. Default to desktop for SSR,
   // then refine on the client after hydration.
   const [isTouchDevice, setIsTouchDevice] = useState(false);
+  // Holds the Leaflet map instance so it can be re-sized when the tab changes.
+  const mapRef = useRef(null);
   useEffect(() => {
     const coarse =
       typeof window !== "undefined" &&
@@ -130,6 +132,105 @@ export default function Home(props) {
     window.addEventListener("popstate", applyFromPath); // browser back / forward
     return () => window.removeEventListener("popstate", applyFromPath);
   }, []);
+
+  // ── Location map (Leaflet, loaded from CDN) ───────────────────────
+  // A street-level pin marks the practice on Van der Werfstraat without ever
+  // exposing the exact house number. On touch devices the map uses cooperative
+  // gestures: one finger scrolls the page (and shows a hint), two fingers pan.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    // Approximate mid-street coordinate — deliberately NOT the exact address.
+    const LEIDEN = [52.1607446,4.4941448];
+    let map;
+
+    const init = () => {
+      const L = window.L;
+      const el = document.getElementById("contactMap");
+      if (!L || !el || el._leaflet_id) return; // guard against double init
+
+      const isMobile = L.Browser.mobile;
+      map = L.map(el, {
+        center: LEIDEN,
+        zoom: 15, // street level, not building level
+        scrollWheelZoom: false, // don't hijack page scroll (enabled on desktop below)
+        dragging: !isMobile, // one-finger drag off on touch; two fingers re-enable it
+        tap: false,
+      });
+      mapRef.current = map;
+
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        maxZoom: 19,
+      }).addTo(map);
+
+      L.marker(LEIDEN).addTo(map).bindPopup("Van der Werfstraat<br>Leiden");
+
+      if (!isMobile) {
+        // Desktop: full interactivity.
+        map.scrollWheelZoom.enable();
+      } else {
+        // Mobile: cooperative gestures + "use two fingers" hint overlay.
+        const hint = document.getElementById("mapHint");
+        el.addEventListener(
+          "touchstart",
+          (e) => {
+            if (e.touches.length >= 2) {
+              map.dragging.enable();
+              hint?.classList.remove("is-visible");
+            } else {
+              map.dragging.disable();
+              hint?.classList.add("is-visible");
+            }
+          },
+          { passive: true }
+        );
+        el.addEventListener("touchend", (e) => {
+          if (e.touches.length === 0) {
+            map.dragging.disable();
+            hint?.classList.remove("is-visible");
+          }
+        });
+      }
+
+      // The map lives in a tab that can start hidden; recalc once it's visible.
+      setTimeout(() => map.invalidateSize(), 0);
+    };
+
+    // Load Leaflet's CSS + JS from CDN once, then initialise.
+    if (window.L) {
+      init();
+    } else {
+      if (!document.getElementById("leaflet-css")) {
+        const link = document.createElement("link");
+        link.id = "leaflet-css";
+        link.rel = "stylesheet";
+        link.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
+        document.head.appendChild(link);
+      }
+      let script = document.getElementById("leaflet-js");
+      if (!script) {
+        script = document.createElement("script");
+        script.id = "leaflet-js";
+        script.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
+        script.async = true;
+        document.body.appendChild(script);
+      }
+      script.addEventListener("load", init);
+    }
+
+    return () => {
+      if (map) map.remove();
+      mapRef.current = null;
+    };
+  }, []);
+
+  // The map may be initialised while the Home tab (and thus the contact section)
+  // is hidden; recalc its size whenever Home becomes visible so tiles render.
+  useEffect(() => {
+    if (activeTab === "home" && mapRef.current) {
+      setTimeout(() => mapRef.current?.invalidateSize(), 0);
+    }
+  }, [activeTab]);
 
   // Pass `scrollToId` to open the Home tab and smooth-scroll to a section on it.
   const selectTab = (id, scrollToId) => {
@@ -594,6 +695,17 @@ export default function Home(props) {
                   clinic's website for their updated pricing and booking.
                 </p>
                 <p data-tina-field={tinaField(contact, "bookingHomeNote")}><em>{contact.bookingHomeNote}</em></p>
+              </div>
+            </div>
+
+            {/* Location map — pin sits at street level on Van der Werfstraat;
+                the exact house number is never shown (privacy). */}
+            <div className="contact__map-wrap">
+              <div className="contact__map" id="contactMap" role="img" aria-label="Map showing the practice location on Van der Werfstraat, Leiden">
+                <div className="sp-map-hint" id="mapHint" aria-hidden="true">Use two fingers to move the map</div>
+              </div>
+              <div className="contact__map-legend">
+                <span><span className="legend__pin legend__pin--green" aria-hidden="true"></span>Van der Werfstraat, Leiden</span>
               </div>
             </div>
           </div>
