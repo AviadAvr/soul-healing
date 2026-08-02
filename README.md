@@ -1,6 +1,6 @@
 # Soul Pathways
 
-Website for **Soul Pathways** — Reiki & Soul Healing in Amsterdam.
+Website for **Soul Pathways** — Reiki & Soul Healing in Leiden.
 Built with **Next.js** (static export) and **TinaCMS** for visual/inline content
 editing, hosted for free on **GitHub Pages**.
 

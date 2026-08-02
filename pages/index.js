@@ -179,20 +179,20 @@ export default function Home(props) {
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta
           name="description"
-          content="Soul Pathways — Reiki and Soul Healing in Amsterdam. Gentle, supportive energy healing sessions to help you reconnect, restore balance, and find calm."
+          content="Soul Pathways — Reiki and Soul Healing in Leiden. Reconnect with a deeper sense of balance, presence and wellbeing in your life."
         />
-        <title>Soul Pathways — Reiki &amp; Soul Healing in Amsterdam</title>
+        <title>Soul Pathways — Reiki &amp; Soul Healing in Leiden</title>
 
         {/* Open Graph / social preview */}
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content="Soul Pathways" />
         <meta
           property="og:title"
-          content="Soul Pathways — Reiki & Soul Healing in Amsterdam"
+          content="Soul Pathways — Reiki & Soul Healing in Leiden"
         />
         <meta
           property="og:description"
-          content="Gentle, supportive energy healing sessions to help you reconnect, restore balance, and find calm."
+          content="Reconnect with a deeper sense of balance, presence and wellbeing in your life."
         />
         <meta
           property="og:image"
@@ -207,7 +207,7 @@ export default function Home(props) {
         <meta property="og:image:height" content="630" />
         <meta
           property="og:image:alt"
-          content="Soul Pathways — Reiki & Soul Healing in Amsterdam"
+          content="Soul Pathways — Reiki & Soul Healing in Leiden"
         />
         <meta property="og:url" content="https://aviadavr.github.io/soul-healing/" />
         <meta name="twitter:card" content="summary_large_image" />
@@ -456,7 +456,7 @@ export default function Home(props) {
                 and mindful integration of these principles in one&apos;s life.
               </p>
               <a href={pathFor("contact")} className="btn btn--primary" onClick={(e) => { e.preventDefault(); selectTab("home", "contact"); }}>
-                Book a session
+                Contact me
               </a>
             </div>
           </div>
@@ -466,38 +466,34 @@ export default function Home(props) {
         <section {...panelProps("soul-healing", "section service-page")}>
           <div className="container">
             <div className="section__head">
-              <p className="section__eyebrow">Inner Work</p>
+              {/*<p className="section__eyebrow">Inner Work</p>*/}
               <h2 className="section__title">Soul Healing</h2>
-              <p className="section__lead">
-                A deeper, intuitive session to help release old patterns and
-                reconnect with your inner self — bringing clarity, lightness, and grounding.
-              </p>
+              {/*<p className="section__lead">*/}
+              {/*  A deeper, intuitive session to help release old patterns and*/}
+              {/*  reconnect with your inner self — bringing clarity, lightness, and grounding.*/}
+              {/*</p>*/}
             </div>
 
             <div className="service-page__body">
+              {/*<h3>What is Soul Healing?</h3>*/}
               <p>
-                <em>Placeholder text — your Soul Healing page copy will go here.</em>
+                <em>I am currently undergoing an intensive training in Esoteric Soul Healing.
+                  As part of this training, I am <strong>offering free sessions</strong> (which also allow me to practice).
+                </em>
               </p>
-              <h3>What is Soul Healing?</h3>
               <p>
-                Soul healing gently works with energy and intention to soften
-                long-held patterns and reconnect you with your deeper self.
-                Describe your unique method and intentions here.
+                <em>I can welcome four new people approximately every six weeks.
+                  If you are interested in participating, or have any questions, you are invited to <a href={pathFor("contact")} onClick={(e) => { e.preventDefault(); selectTab("home", "contact"); }}>contact me</a>.
+                </em>
               </p>
-              <h3>What a session feels like</h3>
               <p>
-                In a calm, held space we explore where energy feels stuck and
-                invite it to move. Many people leave feeling lighter and clearer.
-                Add the flow of your sessions here.
-              </p>
-              <h3>Who it&apos;s for</h3>
-              <p>
-                This work supports those seeking clarity, emotional release, or a
-                renewed sense of grounding. Describe who it&apos;s best suited to and
-                how to prepare.
+                Esoteric Soul Healing is a form of energy healing that works with the energies of the whole person—the physical and energetic bodies, emotions, thoughts, personality and Soul.
+                The Soul is the part of us that is eternal, connects us to each other, the divine and all life, and is filled with universal love. Healing is a process of returning to “wholeness” within yourself by redressing imbalances that have built up in the emotions, mind and body.
+                Soul Healers recognise the presence of the Soul in all people and work with these powerfully transformative energies to facilitate people in their healing.
+                With gratitude for the teachers of this path: Karin Persons, Kathy Jones and Alice Bailey.
               </p>
               <a href={pathFor("contact")} className="btn btn--primary" onClick={(e) => { e.preventDefault(); selectTab("home", "contact"); }}>
-                Book a session
+                Contact me
               </a>
             </div>
           </div>

@@ -853,6 +853,19 @@ h3 {
     margin-top: 20px;
 }
 
+/* Inline links inside body copy — made obvious (bold + hover colour shift),
+   matching the WhatsApp/Email links in the booking section. */
+.service-page__body p a {
+    color: var(--c-sage-dark);
+    font-weight: 700;
+    transition: color 0.15s ease;
+}
+
+.service-page__body p a:hover,
+.service-page__body p a:focus-visible {
+    color: var(--c-ink);
+}
+
 /* Map */
 .contact__map-wrap {
     text-align: center;
