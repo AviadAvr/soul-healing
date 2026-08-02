@@ -48,6 +48,10 @@ const SERVICE_TABS = ["reiki", "soul-healing"];
 // In-page sections at the bottom of Home (reached by switching to Home + scroll).
 const HOME_SECTIONS = ["services", "contact"];
 
+// Google Maps link for the practice street (shared by the map popup & legend).
+const MAPS_URL =
+  "https://www.google.com/maps/dir//Van+der+Werfstraat,+Leiden/@52.1608267,4.4917957,17z/data=!4m18!1m8!3m7!1s0x47c5c6925081e325:0xc57ad6caa402a513!2sVan+der+Werfstraat,+Leiden!3b1!8m2!3d52.1608234!4d4.4943706!16s%2Fg%2F1tgyvx18!4m8!1m0!1m5!1m1!1s0x47c5c6925081e325:0xc57ad6caa402a513!2m2!1d4.4943706!2d52.1608234!3e3?entry=ttu&g_ep=EgoyMDI2MDcyOS4wIKXMDSoASAFQAw%3D%3D";
+
 export default function Home(props) {
   // useTina makes the content live-editable inside the Tina admin iframe.
   const { data } = useTina({
@@ -173,7 +177,14 @@ export default function Home(props) {
         }
       ).addTo(map);
 
-      L.marker(LEIDEN).addTo(map).bindPopup("Van der Werfstraat<br>Leiden");
+      // Popup label links out to Google Maps directions for the street.
+      // Opened by default so the address is visible without a click.
+      L.marker(LEIDEN)
+        .addTo(map)
+        .bindPopup(
+          `<a href="${MAPS_URL}" target="_blank" rel="noopener noreferrer">Van der Werfstraat<br>Leiden</a>`
+        )
+        .openPopup();
 
       if (!isMobile) {
         // Desktop: full interactivity.
@@ -713,9 +724,6 @@ export default function Home(props) {
             <div className="contact__map-wrap">
               <div className="contact__map" id="contactMap" role="img" aria-label="Map showing the practice location on Van der Werfstraat, Leiden">
                 <div className="sp-map-hint" id="mapHint" aria-hidden="true">Use two fingers to move the map</div>
-              </div>
-              <div className="contact__map-legend">
-                <span><span className="legend__pin legend__pin--green" aria-hidden="true"></span>Van der Werfstraat, Leiden</span>
               </div>
             </div>
           </div>
