@@ -174,7 +174,10 @@ export default function Home(props) {
           document.getElementById(seg)?.scrollIntoView({ behavior: "smooth", block: "start" });
         });
       } else {
+        // Unrecognised path (served via the 404.html fallback): show Home and
+        // tidy the address bar so it matches, without adding a history entry.
         setActiveTab("home");
+        window.history.replaceState(null, "", pathFor("home"));
       }
     };
     applyFromPath(); // deep links like /about or /contact on load / refresh
