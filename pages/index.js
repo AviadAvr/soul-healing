@@ -1,6 +1,6 @@
 import Head from "next/head";
 import Script from "next/script";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTina, tinaField } from "tinacms/dist/react";
 import { client } from "../tina/__generated__/client";
 
@@ -48,6 +48,38 @@ const SERVICE_TABS = ["reiki", "soul-healing"];
 // In-page sections at the bottom of Home (reached by switching to Home + scroll).
 const HOME_SECTIONS = ["services", "contact"];
 
+// ── Practice locations (map switcher) ─────────────────────────────
+// Add a new location here and it automatically gets a switch button + pin.
+// `coords` are deliberately street-level (never the exact house number);
+// `url` is the Google Maps link opened from the marker popup.
+const LOCATIONS = [
+  {
+    id: "leiden",
+    label: "Leiden",
+    coords: [52.1607446, 4.4941448],
+    popupLabel: "Van der Werfstraat<br>Leiden",
+    url: "https://www.google.com/maps/dir//Van+der+Werfstraat,+Leiden/@52.1608267,4.4917957,17z/data=!4m18!1m8!3m7!1s0x47c5c6925081e325:0xc57ad6caa402a513!2sVan+der+Werfstraat,+Leiden!3b1!8m2!3d52.1608234!4d4.4943706!16s%2Fg%2F1tgyvx18!4m8!1m0!1m5!1m1!1s0x47c5c6925081e325:0xc57ad6caa402a513!2m2!1d4.4943706!2d52.1608234!3e3?entry=ttu&g_ep=EgoyMDI2MDcyOS4wIKXMDSoASAFQAw%3D%3D",
+  },
+  {
+    id: "amsterdam",
+    label: "Amsterdam",
+    coords: [52.3725301, 4.8804524],
+    popupLabel: "The Integration Room<br>Amsterdam",
+    url: "https://www.google.com/maps/dir//The+Integration+Room+%7C+Walk-In+Therapy+Studio+Amsterdam,+Eerste+Laurierdwarsstraat+2,+1016+PX+Amsterdam/@52.3725333,4.8778775,17z/data=!4m17!1m7!3m6!1s0x47c6093a4374ab2b:0xc6a8c57ee8cfbf1f!2sThe+Integration+Room+%7C+Walk-In+Therapy+Studio+Amsterdam!8m2!3d52.3725301!4d4.8804524!16s%2Fg%2F11xyqcyz4t!4m8!1m0!1m5!1m1!1s0x47c6093a4374ab2b:0xc6a8c57ee8cfbf1f!2m2!1d4.8804524!2d52.3725301!3e3?entry=ttu&g_ep=EgoyMDI2MDcyOS4wIKXMDSoASAFQAw%3D%3D",
+  },
+];
+const DEFAULT_LOCATION_ID = "leiden";
+
+// Point an existing Leaflet map + marker at a location (updates pin, popup & view).
+const showLocation = (map, marker, loc) => {
+  marker.setLatLng(loc.coords);
+  marker.setPopupContent(
+    `<a href="${loc.url}" target="_blank" rel="noopener noreferrer">${loc.popupLabel}</a>`
+  );
+  map.setView(loc.coords, map.getZoom());
+  marker.openPopup();
+};
+
 export default function Home(props) {
   // useTina makes the content live-editable inside the Tina admin iframe.
   const { data } = useTina({
@@ -76,6 +108,25 @@ export default function Home(props) {
   // desktop they copy to the clipboard instead. Default to desktop for SSR,
   // then refine on the client after hydration.
   const [isTouchDevice, setIsTouchDevice] = useState(false);
+  // Holds the Leaflet map instance so it can be re-sized when the tab changes.
+  const mapRef = useRef(null);
+  // The single marker whose position/popup we move between locations.
+  const markerRef = useRef(null);
+  // Which practice location the map currently shows (Leiden by default).
+  const [activeLocation, setActiveLocation] = useState(DEFAULT_LOCATION_ID);
+  // Mirror of activeLocation for use inside the (mount-only) map init closure.
+  const activeLocationRef = useRef(DEFAULT_LOCATION_ID);
+
+  // Centre the map on a location. Always recentres — even when re-selecting the
+  // current location after the user has panned away.
+  const selectLocation = (id) => {
+    activeLocationRef.current = id;
+    setActiveLocation(id);
+    const map = mapRef.current;
+    const marker = markerRef.current;
+    const loc = LOCATIONS.find((l) => l.id === id);
+    if (map && marker && loc) showLocation(map, marker, loc);
+  };
   useEffect(() => {
     const coarse =
       typeof window !== "undefined" &&
@@ -130,6 +181,125 @@ export default function Home(props) {
     window.addEventListener("popstate", applyFromPath); // browser back / forward
     return () => window.removeEventListener("popstate", applyFromPath);
   }, []);
+
+  // ── Location map (Leaflet, loaded from CDN) ───────────────────────
+  // A street-level pin marks the practice on Van der Werfstraat without ever
+  // exposing the exact house number. On touch devices the map uses cooperative
+  // gestures: one finger scrolls the page (and shows a hint), two fingers pan.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    // Start on whichever location is currently selected (Leiden by default).
+    const startLoc =
+      LOCATIONS.find((l) => l.id === activeLocationRef.current) || LOCATIONS[0];
+    let map;
+
+    const init = () => {
+      const L = window.L;
+      const el = document.getElementById("contactMap");
+      if (!L || !el || el._leaflet_id) return; // guard against double init
+
+      const isMobile = L.Browser.mobile;
+      map = L.map(el, {
+        center: startLoc.coords,
+        zoom: 15, // street level, not building level
+        scrollWheelZoom: false, // don't hijack page scroll (enabled on desktop below)
+        dragging: !isMobile, // one-finger drag off on touch; two fingers re-enable it
+        tap: false,
+      });
+      mapRef.current = map;
+
+      // Jawg "Streets" — soft, detailed street map (free tier, needs a token).
+      // Get a free access token at https://www.jawg.io and set it in
+      // NEXT_PUBLIC_JAWG_TOKEN (see .env). Other Jawg styles:
+      //   jawg-sunny / jawg-light / jawg-terrain / jawg-dark
+      const jawgToken = process.env.NEXT_PUBLIC_JAWG_TOKEN;
+      L.tileLayer(
+        `https://tile.jawg.io/jawg-streets/{z}/{x}/{y}{r}.png?access-token=${jawgToken}`,
+        {
+          attribution:
+            '<a href="https://jawg.io" title="Tiles Courtesy of Jawg Maps" target="_blank">&copy; <b>Jawg</b>Maps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+          minZoom: 0,
+          maxZoom: 22,
+        }
+      ).addTo(map);
+
+      // A single marker; its popup links out to Google Maps and opens by
+      // default. autoPan is off so opening the popup can't nudge the map away
+      // from having the marker centred.
+      const marker = L.marker(startLoc.coords)
+        .addTo(map)
+        .bindPopup("", { autoPan: false });
+      markerRef.current = marker;
+      showLocation(map, marker, startLoc);
+
+      if (!isMobile) {
+        // Desktop: full interactivity.
+        map.scrollWheelZoom.enable();
+      } else {
+        // Mobile: cooperative gestures + "use two fingers" hint overlay.
+        const hint = document.getElementById("mapHint");
+        el.addEventListener(
+          "touchstart",
+          (e) => {
+            if (e.touches.length >= 2) {
+              map.dragging.enable();
+              hint?.classList.remove("is-visible");
+            } else {
+              map.dragging.disable();
+              hint?.classList.add("is-visible");
+            }
+          },
+          { passive: true }
+        );
+        el.addEventListener("touchend", (e) => {
+          if (e.touches.length === 0) {
+            map.dragging.disable();
+            hint?.classList.remove("is-visible");
+          }
+        });
+      }
+
+      // The map lives in a tab that can start hidden; recalc once it's visible.
+      setTimeout(() => map.invalidateSize(), 0);
+    };
+
+    // Load Leaflet's CSS + JS from CDN once, then initialise.
+    if (window.L) {
+      init();
+    } else {
+      if (!document.getElementById("leaflet-css")) {
+        const link = document.createElement("link");
+        link.id = "leaflet-css";
+        link.rel = "stylesheet";
+        link.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
+        document.head.appendChild(link);
+      }
+      let script = document.getElementById("leaflet-js");
+      if (!script) {
+        script = document.createElement("script");
+        script.id = "leaflet-js";
+        script.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
+        script.async = true;
+        document.body.appendChild(script);
+      }
+      script.addEventListener("load", init);
+    }
+
+    return () => {
+      if (map) map.remove();
+      mapRef.current = null;
+      markerRef.current = null;
+    };
+  }, []);
+
+
+  // The map may be initialised while the Home tab (and thus the contact section)
+  // is hidden; recalc its size whenever Home becomes visible so tiles render.
+  useEffect(() => {
+    if (activeTab === "home" && mapRef.current) {
+      setTimeout(() => mapRef.current?.invalidateSize(), 0);
+    }
+  }, [activeTab]);
 
   // Pass `scrollToId` to open the Home tab and smooth-scroll to a section on it.
   const selectTab = (id, scrollToId) => {
@@ -594,6 +764,27 @@ export default function Home(props) {
                   clinic's website for their updated pricing and booking.
                 </p>
                 <p data-tina-field={tinaField(contact, "bookingHomeNote")}><em>{contact.bookingHomeNote}</em></p>
+              </div>
+            </div>
+
+            {/* Location map — pin sits at street level (never the exact house
+                number). Buttons above the map switch between practice locations. */}
+            <div className="contact__map-wrap">
+              <div className="contact__map-switch" role="group" aria-label="Choose a location">
+                {LOCATIONS.map((loc) => (
+                  <button
+                    key={loc.id}
+                    type="button"
+                    className={`contact__map-btn${activeLocation === loc.id ? " is-active" : ""}`}
+                    aria-pressed={activeLocation === loc.id}
+                    onClick={() => selectLocation(loc.id)}
+                  >
+                    {loc.label}
+                  </button>
+                ))}
+              </div>
+              <div className="contact__map" id="contactMap" role="img" aria-label="Map showing the selected practice location">
+                <div className="sp-map-hint" id="mapHint" aria-hidden="true">Use two fingers to move the map</div>
               </div>
             </div>
           </div>

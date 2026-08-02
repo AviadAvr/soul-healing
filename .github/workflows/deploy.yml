@@ -42,6 +42,7 @@ jobs:
           # Provided via repo Settings → Secrets and variables → Actions.
           NEXT_PUBLIC_TINA_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_TINA_CLIENT_ID }}
           TINA_TOKEN: ${{ secrets.TINA_TOKEN }}
+          NEXT_PUBLIC_JAWG_TOKEN: ${{ secrets.NEXT_PUBLIC_JAWG_TOKEN }}
           GITHUB_BRANCH: main
         run: npm run build
 
