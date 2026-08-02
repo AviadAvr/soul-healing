@@ -158,10 +158,20 @@ export default function Home(props) {
       });
       mapRef.current = map;
 
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-        maxZoom: 19,
-      }).addTo(map);
+      // Jawg "Streets" — soft, detailed street map (free tier, needs a token).
+      // Get a free access token at https://www.jawg.io and set it in
+      // NEXT_PUBLIC_JAWG_TOKEN (see .env). Other Jawg styles:
+      //   jawg-sunny / jawg-light / jawg-terrain / jawg-dark
+      const jawgToken = process.env.NEXT_PUBLIC_JAWG_TOKEN;
+      L.tileLayer(
+        `https://tile.jawg.io/jawg-streets/{z}/{x}/{y}{r}.png?access-token=${jawgToken}`,
+        {
+          attribution:
+            '<a href="https://jawg.io" title="Tiles Courtesy of Jawg Maps" target="_blank">&copy; <b>Jawg</b>Maps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+          minZoom: 0,
+          maxZoom: 22,
+        }
+      ).addTo(map);
 
       L.marker(LEIDEN).addTo(map).bindPopup("Van der Werfstraat<br>Leiden");
 
