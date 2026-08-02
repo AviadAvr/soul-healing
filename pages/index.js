@@ -48,9 +48,37 @@ const SERVICE_TABS = ["reiki", "soul-healing"];
 // In-page sections at the bottom of Home (reached by switching to Home + scroll).
 const HOME_SECTIONS = ["services", "contact"];
 
-// Google Maps link for the practice street (shared by the map popup & legend).
-const MAPS_URL =
-  "https://www.google.com/maps/dir//Van+der+Werfstraat,+Leiden/@52.1608267,4.4917957,17z/data=!4m18!1m8!3m7!1s0x47c5c6925081e325:0xc57ad6caa402a513!2sVan+der+Werfstraat,+Leiden!3b1!8m2!3d52.1608234!4d4.4943706!16s%2Fg%2F1tgyvx18!4m8!1m0!1m5!1m1!1s0x47c5c6925081e325:0xc57ad6caa402a513!2m2!1d4.4943706!2d52.1608234!3e3?entry=ttu&g_ep=EgoyMDI2MDcyOS4wIKXMDSoASAFQAw%3D%3D";
+// ── Practice locations (map switcher) ─────────────────────────────
+// Add a new location here and it automatically gets a switch button + pin.
+// `coords` are deliberately street-level (never the exact house number);
+// `url` is the Google Maps link opened from the marker popup.
+const LOCATIONS = [
+  {
+    id: "leiden",
+    label: "Leiden",
+    coords: [52.1607446, 4.4941448],
+    popupLabel: "Van der Werfstraat<br>Leiden",
+    url: "https://www.google.com/maps/dir//Van+der+Werfstraat,+Leiden/@52.1608267,4.4917957,17z/data=!4m18!1m8!3m7!1s0x47c5c6925081e325:0xc57ad6caa402a513!2sVan+der+Werfstraat,+Leiden!3b1!8m2!3d52.1608234!4d4.4943706!16s%2Fg%2F1tgyvx18!4m8!1m0!1m5!1m1!1s0x47c5c6925081e325:0xc57ad6caa402a513!2m2!1d4.4943706!2d52.1608234!3e3?entry=ttu&g_ep=EgoyMDI2MDcyOS4wIKXMDSoASAFQAw%3D%3D",
+  },
+  {
+    id: "amsterdam",
+    label: "Amsterdam",
+    coords: [52.3725301, 4.8804524],
+    popupLabel: "The Integration Room<br>Amsterdam",
+    url: "https://www.google.com/maps/dir//The+Integration+Room+%7C+Walk-In+Therapy+Studio+Amsterdam,+Eerste+Laurierdwarsstraat+2,+1016+PX+Amsterdam/@52.3725333,4.8778775,17z/data=!4m17!1m7!3m6!1s0x47c6093a4374ab2b:0xc6a8c57ee8cfbf1f!2sThe+Integration+Room+%7C+Walk-In+Therapy+Studio+Amsterdam!8m2!3d52.3725301!4d4.8804524!16s%2Fg%2F11xyqcyz4t!4m8!1m0!1m5!1m1!1s0x47c6093a4374ab2b:0xc6a8c57ee8cfbf1f!2m2!1d4.8804524!2d52.3725301!3e3?entry=ttu&g_ep=EgoyMDI2MDcyOS4wIKXMDSoASAFQAw%3D%3D",
+  },
+];
+const DEFAULT_LOCATION_ID = "leiden";
+
+// Point an existing Leaflet map + marker at a location (updates pin, popup & view).
+const showLocation = (map, marker, loc) => {
+  marker.setLatLng(loc.coords);
+  marker.setPopupContent(
+    `<a href="${loc.url}" target="_blank" rel="noopener noreferrer">${loc.popupLabel}</a>`
+  );
+  map.setView(loc.coords, map.getZoom());
+  marker.openPopup();
+};
 
 export default function Home(props) {
   // useTina makes the content live-editable inside the Tina admin iframe.
@@ -82,6 +110,23 @@ export default function Home(props) {
   const [isTouchDevice, setIsTouchDevice] = useState(false);
   // Holds the Leaflet map instance so it can be re-sized when the tab changes.
   const mapRef = useRef(null);
+  // The single marker whose position/popup we move between locations.
+  const markerRef = useRef(null);
+  // Which practice location the map currently shows (Leiden by default).
+  const [activeLocation, setActiveLocation] = useState(DEFAULT_LOCATION_ID);
+  // Mirror of activeLocation for use inside the (mount-only) map init closure.
+  const activeLocationRef = useRef(DEFAULT_LOCATION_ID);
+
+  // Centre the map on a location. Always recentres — even when re-selecting the
+  // current location after the user has panned away.
+  const selectLocation = (id) => {
+    activeLocationRef.current = id;
+    setActiveLocation(id);
+    const map = mapRef.current;
+    const marker = markerRef.current;
+    const loc = LOCATIONS.find((l) => l.id === id);
+    if (map && marker && loc) showLocation(map, marker, loc);
+  };
   useEffect(() => {
     const coarse =
       typeof window !== "undefined" &&
@@ -143,8 +188,9 @@ export default function Home(props) {
   // gestures: one finger scrolls the page (and shows a hint), two fingers pan.
   useEffect(() => {
     if (typeof window === "undefined") return;
-    // Approximate mid-street coordinate — deliberately NOT the exact address.
-    const LEIDEN = [52.1607446,4.4941448];
+    // Start on whichever location is currently selected (Leiden by default).
+    const startLoc =
+      LOCATIONS.find((l) => l.id === activeLocationRef.current) || LOCATIONS[0];
     let map;
 
     const init = () => {
@@ -154,7 +200,7 @@ export default function Home(props) {
 
       const isMobile = L.Browser.mobile;
       map = L.map(el, {
-        center: LEIDEN,
+        center: startLoc.coords,
         zoom: 15, // street level, not building level
         scrollWheelZoom: false, // don't hijack page scroll (enabled on desktop below)
         dragging: !isMobile, // one-finger drag off on touch; two fingers re-enable it
@@ -177,14 +223,14 @@ export default function Home(props) {
         }
       ).addTo(map);
 
-      // Popup label links out to Google Maps directions for the street.
-      // Opened by default so the address is visible without a click.
-      L.marker(LEIDEN)
+      // A single marker; its popup links out to Google Maps and opens by
+      // default. autoPan is off so opening the popup can't nudge the map away
+      // from having the marker centred.
+      const marker = L.marker(startLoc.coords)
         .addTo(map)
-        .bindPopup(
-          `<a href="${MAPS_URL}" target="_blank" rel="noopener noreferrer">Van der Werfstraat<br>Leiden</a>`
-        )
-        .openPopup();
+        .bindPopup("", { autoPan: false });
+      markerRef.current = marker;
+      showLocation(map, marker, startLoc);
 
       if (!isMobile) {
         // Desktop: full interactivity.
@@ -242,8 +288,10 @@ export default function Home(props) {
     return () => {
       if (map) map.remove();
       mapRef.current = null;
+      markerRef.current = null;
     };
   }, []);
+
 
   // The map may be initialised while the Home tab (and thus the contact section)
   // is hidden; recalc its size whenever Home becomes visible so tiles render.
@@ -719,10 +767,23 @@ export default function Home(props) {
               </div>
             </div>
 
-            {/* Location map — pin sits at street level on Van der Werfstraat;
-                the exact house number is never shown (privacy). */}
+            {/* Location map — pin sits at street level (never the exact house
+                number). Buttons above the map switch between practice locations. */}
             <div className="contact__map-wrap">
-              <div className="contact__map" id="contactMap" role="img" aria-label="Map showing the practice location on Van der Werfstraat, Leiden">
+              <div className="contact__map-switch" role="group" aria-label="Choose a location">
+                {LOCATIONS.map((loc) => (
+                  <button
+                    key={loc.id}
+                    type="button"
+                    className={`contact__map-btn${activeLocation === loc.id ? " is-active" : ""}`}
+                    aria-pressed={activeLocation === loc.id}
+                    onClick={() => selectLocation(loc.id)}
+                  >
+                    {loc.label}
+                  </button>
+                ))}
+              </div>
+              <div className="contact__map" id="contactMap" role="img" aria-label="Map showing the selected practice location">
                 <div className="sp-map-hint" id="mapHint" aria-hidden="true">Use two fingers to move the map</div>
               </div>
             </div>
