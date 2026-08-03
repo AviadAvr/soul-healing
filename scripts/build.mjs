@@ -5,7 +5,7 @@
 // `EEXIST`. We avoid it by hiding public/ during `next build`, then copying it
 // into out/ ourselves with a single-threaded fs.cpSync.
 
-import { rmSync, existsSync, renameSync, cpSync } from "node:fs";
+import { rmSync, existsSync, renameSync, cpSync, copyFileSync } from "node:fs";
 import { execSync } from "node:child_process";
 
 const run = (cmd) => execSync(cmd, { stdio: "inherit" });
@@ -43,6 +43,15 @@ try {
 
 // Copy public/ -> out/ sequentially (no EEXIST race).
 cpSync(PUBLIC, "out", { recursive: true, force: true });
+
+// GitHub Pages only serves a custom 404 from `404.html` at the site root, but
+// `trailingSlash: true` makes Next emit the not-found page as `out/404/index.html`.
+// Mirror it to `out/404.html` so unknown URLs boot the SPA (which then cleans up
+// the address bar) instead of hitting GitHub's default 404 page.
+if (!existsSync("out/404.html") && existsSync("out/404/index.html")) {
+  copyFileSync("out/404/index.html", "out/404.html");
+  console.log("Mirrored out/404/index.html -> out/404.html (GitHub Pages fallback).");
+}
 
 console.log("\n✅ Build succeeded (public/ copied sequentially).");
 
