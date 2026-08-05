@@ -1,4 +1,5 @@
-// Production build for the GitHub Pages project site (served under /soul-healing).
+// Production build for the custom-domain site (soul-pathways.com), served from
+// the root and hosted on GitHub Pages (see public/CNAME).
 //
 // Works around a Windows-only race in Next's `output: 'export'`: it copies
 // public/ into out/ with a 32-way parallel copy that intermittently throws
@@ -18,10 +19,11 @@ const clean = () => {
   rmSync(".next", { recursive: true, force: true });
 };
 
-// Tell TinaCMS's admin SPA to load its assets from /soul-healing. tinacms build
-// runs before next build, so NODE_ENV isn't "production" yet — an explicit env
-// var is the reliable signal. Local dev uses `tinacms dev`, which skips this.
-process.env.TINA_PUBLIC_BASE_PATH = "soul-healing";
+// The site is served from the root of the custom domain, so the TinaCMS admin
+// SPA loads its assets from "/" too. Keep this empty (no base path). tinacms
+// build runs before next build, so this env var is the reliable signal.
+// Local dev uses `tinacms dev`, which skips this.
+process.env.TINA_PUBLIC_BASE_PATH = "";
 
 // If a previous crashed run left public/ hidden, restore it first.
 if (!existsSync(PUBLIC) && existsSync(HIDDEN)) {

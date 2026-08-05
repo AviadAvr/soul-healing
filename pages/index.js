@@ -369,11 +369,11 @@ export default function Home(props) {
         />
         <meta
           property="og:image"
-          content="https://aviadavr.github.io/soul-healing/static/images/og-preview.jpg"
+          content="https://soul-pathways.com/static/images/og-preview.jpg"
         />
         <meta
           property="og:image:secure_url"
-          content="https://aviadavr.github.io/soul-healing/static/images/og-preview.jpg"
+          content="https://soul-pathways.com/static/images/og-preview.jpg"
         />
         <meta property="og:image:type" content="image/jpeg" />
         <meta property="og:image:width" content="1200" />
@@ -382,11 +382,11 @@ export default function Home(props) {
           property="og:image:alt"
           content="Soul Pathways — Reiki & Soul Healing in Leiden"
         />
-        <meta property="og:url" content="https://aviadavr.github.io/soul-healing/" />
+        <meta property="og:url" content="https://soul-pathways.com/" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta
           name="twitter:image"
-          content="https://aviadavr.github.io/soul-healing/static/images/og-preview.jpg"
+          content="https://soul-pathways.com/static/images/og-preview.jpg"
         />
 
         <meta name="theme-color" content="#7d9b78" />

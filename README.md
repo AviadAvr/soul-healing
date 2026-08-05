@@ -24,7 +24,7 @@ soul-healing/
 │   │   ├── make-hero-bg.py     # -> public/static/images/hero-bg.svg
 │   │   ├── make-about-2.py     # -> public/static/images/about-2.svg
 │   │   └── make-og-image.py    # -> public/static/images/og-preview.jpg
-├── next.config.mjs         # Static export + /soul-healing basePath
+├── next.config.mjs         # Static export, served from the domain root (no basePath)
 └── .github/workflows/deploy.yml  # Builds and deploys to GitHub Pages
 ```
 
@@ -90,7 +90,9 @@ and publishes `./out` to GitHub Pages. Two one-time repo settings are required:
 2. **Settings → Secrets and variables → Actions** — add `NEXT_PUBLIC_TINA_CLIENT_ID`
    and `TINA_TOKEN` (from your Tina Cloud project).
 
-The live site is served under the `/soul-healing/` sub-path.
+The live site is served from the root of the custom domain
+(`https://soul-pathways.com/`). The `public/CNAME` file tells GitHub Pages which
+domain to serve, and is republished on every deploy.
 
 ## Editing content
 
