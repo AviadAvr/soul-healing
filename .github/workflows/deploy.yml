@@ -46,10 +46,27 @@ jobs:
           GITHUB_BRANCH: main
         run: npm run build
 
+      # Inlined from actions/upload-pages-artifact because that composite action
+      # references actions/upload-artifact by tag internally, which violates the
+      # repo's "actions must be pinned to a full-length commit SHA" policy.
+      - name: Archive artifact
+        shell: bash
+        run: |
+          tar \
+            --dereference --hard-dereference \
+            --directory ./out \
+            -cvf "$RUNNER_TEMP/artifact.tar" \
+            --exclude=.git \
+            --exclude=.github \
+            .
+
       - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3.0.1
+        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3
         with:
-          path: ./out
+          name: github-pages
+          path: ${{ runner.temp }}/artifact.tar
+          retention-days: 1
+          if-no-files-found: error
 
   deploy:
     needs: build
