@@ -1,0 +1,27 @@
+version: 2
+updates:
+  # Keep GitHub Actions pinned to SHAs, but auto-bump them (and the version
+  # comment) when new releases are published.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "ci"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+
+  # Keep npm dependencies (Next.js, React, TinaCMS, etc.) up to date.
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "deps"
+    groups:
+      npm-dependencies:
+        patterns:
+          - "*"
+
