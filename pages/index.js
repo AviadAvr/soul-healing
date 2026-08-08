@@ -1,8 +1,17 @@
 import Head from "next/head";
 import Script from "next/script";
+import fs from "fs";
+import path from "path";
 import { Fragment, useEffect, useRef, useState } from "react";
 import { useTina, tinaField } from "tinacms/dist/react";
-import { client } from "../tina/__generated__/client";
+import {
+  HeroDocument,
+  AboutDocument,
+  ServicesDocument,
+  ReikiDocument,
+  SoulHealingDocument,
+  ContactDocument,
+} from "../tina/__generated__/types";
 
 // Plain <img>/<link>/<script> srcs are NOT auto-prefixed with basePath the way
 // next/link and next/image are, so we prefix them manually for GitHub Pages.
@@ -884,25 +893,51 @@ export default function Home(props) {
   );
 }
 
-// Pull each section's content from its own document in content/<section>/ through
-// Tina at build time. Every section is a separate collection so it can be edited
-// independently in the CMS; the props feed one useTina() hook each.
-export const getStaticProps = async () => {
-  const rel = "index.json";
-  const [hero, about, services, reiki, soulHealing, contact] = await Promise.all([
-    client.queries.hero({ relativePath: rel }),
-    client.queries.about({ relativePath: rel }),
-    client.queries.services({ relativePath: rel }),
-    client.queries.reiki({ relativePath: rel }),
-    client.queries.soulHealing({ relativePath: rel }),
-    client.queries.contact({ relativePath: rel }),
-  ]);
-
-  // Each result is { data, query, variables } — exactly what useTina() expects.
+// Build static props from the committed content files rather than querying Tina
+// Cloud at build time. After a schema change Tina Cloud re-indexes the branch
+// asynchronously *after* the push, so a cloud query during the deploy build can
+// race ahead of indexing and fail ("Cannot query field …"). Reading the local
+// JSON (which is exactly what Tina commits to git) makes the build deterministic.
+// The generated query string + variables are still handed to useTina so inline
+// editing in /admin keeps working — there it re-fetches live from Tina Cloud
+// client-side, by which point indexing has caught up.
+const readSection = (folder, field, query) => {
+  const relativePath = "index.json";
+  const file = path.join(process.cwd(), "content", folder, relativePath);
+  const values = JSON.parse(fs.readFileSync(file, "utf8"));
+  const typename = field.charAt(0).toUpperCase() + field.slice(1);
   return {
-    props: { hero, about, services, reiki, soulHealing, contact },
+    query,
+    variables: { relativePath },
+    data: {
+      [field]: {
+        __typename: typename,
+        id: `content/${folder}/${relativePath}`,
+        _sys: {
+          filename: "index",
+          basename: "index.json",
+          hasReferences: false,
+          breadcrumbs: ["index"],
+          path: `content/${folder}/${relativePath}`,
+          relativePath,
+          extension: ".json",
+        },
+        ...values,
+      },
+    },
   };
 };
+
+export const getStaticProps = async () => ({
+  props: {
+    hero: readSection("hero", "hero", HeroDocument),
+    about: readSection("about", "about", AboutDocument),
+    services: readSection("services", "services", ServicesDocument),
+    reiki: readSection("reiki", "reiki", ReikiDocument),
+    soulHealing: readSection("soul-healing", "soulHealing", SoulHealingDocument),
+    contact: readSection("contact", "contact", ContactDocument),
+  },
+});
 
 
 
