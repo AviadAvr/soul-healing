@@ -1,0 +1,18 @@
+{
+  "eyebrow": "What I offer",
+  "title": "Services",
+  "lead": "I offer different energy healing methods to facilitate a personalised process according to your needs and preferences. Feel free to reach out with any questions, I am here to support you on your healing journey.",
+  "cards": [
+    {
+      "icon": "✹",
+      "title": "Reiki",
+      "text": "Works with the body’s energy systems to enhance its natural healing abilities. By assisting your body to replenish its energy stores, Reiki supports your nervous system for a greater sense of relief and restoration."
+    },
+    {
+      "icon": "☽",
+      "title": "Soul Healing",
+      "text": "Works with the energies of the whole person—the physical and energetic bodies, emotions, thoughts, personality and Soul. Guides your Soul’s energy to move through areas of dis-ease or imbalance to bring you back to a state of “wholeness”."
+    }
+  ]
+}
+
