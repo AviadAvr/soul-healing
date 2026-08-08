@@ -179,7 +179,7 @@ export default defineConfig({
           {
             type: "string",
             name: "intro",
-            label: "Intro paragraphs (shown in italic)",
+            label: "Intro notes (shown in italic, above the sections)",
             list: true,
             ui: { component: "textarea" },
             description:
@@ -187,12 +187,34 @@ export default defineConfig({
           },
           {
             type: "string",
-            name: "body",
-            label: "Body paragraphs",
-            list: true,
+            name: "lead",
+            label: "Lead paragraph (optional)",
             ui: { component: "textarea" },
-            description:
-              "Supports *italic*, **bold** and [links](https://…) or [contact me](contact).",
+          },
+          {
+            type: "object",
+            name: "sections",
+            label: "Content sections",
+            list: true,
+            ui: { itemProps: (item) => ({ label: item?.heading }) },
+            fields: [
+              { type: "string", name: "heading", label: "Heading" },
+              {
+                type: "string",
+                name: "gloss",
+                label: "Gloss (italic sub-line, optional)",
+                description:
+                  "Wrap words in *asterisks* for italics, **double** for bold.",
+              },
+              {
+                type: "string",
+                name: "body",
+                label: "Body",
+                ui: { component: "textarea" },
+                description:
+                  "Supports *italic*, **bold** and [links](https://…) or [contact me](contact).",
+              },
+            ],
           },
           { type: "string", name: "cta", label: "Button label" },
         ],

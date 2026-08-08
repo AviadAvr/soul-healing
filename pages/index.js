@@ -715,6 +715,11 @@ export default function Home(props) {
                 <p className="section__eyebrow" data-tina-field={tinaField(soulHealing, "eyebrow")}>{soulHealing.eyebrow}</p>
               )}
               <h2 className="section__title" data-tina-field={tinaField(soulHealing, "title")}>{soulHealing.title}</h2>
+              {soulHealing.lead && (
+                <p className="section__lead" data-tina-field={tinaField(soulHealing, "lead")}>
+                  {soulHealing.lead}
+                </p>
+              )}
             </div>
 
             <div className="service-page__body">
@@ -723,10 +728,16 @@ export default function Home(props) {
                   <em>{renderInline(para, { selectTab })}</em>
                 </p>
               ))}
-              {soulHealing.body?.map((para, i) => (
-                <p key={`body-${i}`} data-tina-field={tinaField(soulHealing, "body")}>
-                  {renderInline(para, { selectTab })}
-                </p>
+              {soulHealing.sections?.map((s, i) => (
+                <Fragment key={i}>
+                  <h3 data-tina-field={tinaField(s, "heading")}>{s.heading}</h3>
+                  {s.gloss && (
+                    <p className="service-page__gloss" data-tina-field={tinaField(s, "gloss")}>
+                      {renderInline(s.gloss, { selectTab })}
+                    </p>
+                  )}
+                  <p data-tina-field={tinaField(s, "body")}>{renderInline(s.body, { selectTab })}</p>
+                </Fragment>
               ))}
               <a href={pathFor("contact")} className="btn btn--primary" onClick={(e) => { e.preventDefault(); selectTab("home", "contact"); }} data-tina-field={tinaField(soulHealing, "cta")}>
                 {soulHealing.cta}
