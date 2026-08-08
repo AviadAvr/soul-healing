@@ -26,10 +26,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@v4
 
       - name: Setup Node
-        uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0
+        uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
@@ -46,27 +46,10 @@ jobs:
           GITHUB_BRANCH: main
         run: npm run build
 
-      # Inlined from actions/upload-pages-artifact because that composite action
-      # references actions/upload-artifact by tag internally, which violates the
-      # repo's "actions must be pinned to a full-length commit SHA" policy.
-      - name: Archive artifact
-        shell: bash
-        run: |
-          tar \
-            --dereference --hard-dereference \
-            --directory ./out \
-            -cvf "$RUNNER_TEMP/artifact.tar" \
-            --exclude=.git \
-            --exclude=.github \
-            .
-
       - name: Upload Pages artifact
-        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3
+        uses: actions/upload-pages-artifact@v3
         with:
-          name: github-pages
-          path: ${{ runner.temp }}/artifact.tar
-          retention-days: 1
-          if-no-files-found: error
+          path: ./out
 
   deploy:
     needs: build
@@ -77,5 +60,5 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4.0.5
+        uses: actions/deploy-pages@v4
 
