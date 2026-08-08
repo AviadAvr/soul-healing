@@ -512,6 +512,8 @@ h3 {
 
 .about__highlights li::before {
     content: "✦";
+    /*content: "꩜";*/
+    /*content: "•";*/
     position: absolute;
     left: 0;
     color: var(--c-sage);
@@ -1005,12 +1007,18 @@ h3 {
         border-bottom: 1px solid var(--c-line);
         padding: 8px 24px 20px;
         box-shadow: var(--shadow-md);
-        transform: translateY(-120%);
-        transition: transform 0.3s ease;
+        /* Slide fully above the viewport when closed — clearing the header too —
+           so no sliver bleeds through the translucent sticky header. Hide it
+           afterwards so its shadow/border never show at the top edge. */
+        transform: translateY(calc(-100% - var(--header-h)));
+        visibility: hidden;
+        transition: transform 0.3s ease, visibility 0s linear 0.3s;
     }
 
     .nav__menu.is-open {
         transform: translateY(0);
+        visibility: visible;
+        transition: transform 0.3s ease;
     }
 
     .nav__menu li {

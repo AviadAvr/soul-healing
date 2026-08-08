@@ -31,7 +31,13 @@ if (!existsSync(PUBLIC) && existsSync(HIDDEN)) {
 }
 
 clean();
-run("tinacms build");
+// `--skip-cloud-checks` avoids the "local schema doesn't match remote" hard
+// failure in CI. After a schema change (e.g. splitting collections), Tina Cloud
+// re-indexes the branch asynchronously *after* the push, so a build triggered by
+// that same push races ahead of indexing and would otherwise fail. The content
+// lives in git and the admin SPA is built from the local schema regardless, so
+// skipping the check here is safe; Tina Cloud catches up once indexing finishes.
+run("tinacms build --skip-cloud-checks");
 
 // Hide public/ so `next build` skips its racy parallel copy.
 let hidden = false;

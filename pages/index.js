@@ -1,8 +1,17 @@
 import Head from "next/head";
 import Script from "next/script";
-import { useEffect, useRef, useState } from "react";
+import fs from "fs";
+import path from "path";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { useTina, tinaField } from "tinacms/dist/react";
-import { client } from "../tina/__generated__/client";
+import {
+  HeroDocument,
+  AboutDocument,
+  ServicesDocument,
+  ReikiDocument,
+  SoulHealingDocument,
+  ContactDocument,
+} from "../tina/__generated__/types";
 
 // Plain <img>/<link>/<script> srcs are NOT auto-prefixed with basePath the way
 // next/link and next/image are, so we prefix them manually for GitHub Pages.
@@ -33,6 +42,69 @@ const withEmphasis = (text) =>
   (text || "").split(/\*([^*]+)\*/g).map((chunk, i) =>
     i % 2 === 1 ? <em key={i}>{chunk}</em> : chunk
   );
+
+// Richer inline renderer for body copy: supports **bold**, *italic* and
+// [label](target) links. Pass a context object:
+//   { selectTab, resolveLink }
+// `resolveLink(label, target, key)` lets the caller render special links (e.g.
+// WhatsApp / Email / a stored URL) and should return a React element, or a
+// falsy value to fall back to the defaults below. A target of "contact" opens
+// the Contact section on the Home tab; anything else is treated as an external
+// URL. Everything stays plain, editable text in Tina — no raw HTML.
+const renderInline = (text, ctx = {}) => {
+  const { selectTab, resolveLink } = ctx;
+  const out = [];
+  let key = 0;
+
+  // Apply **bold** / *italic* to a plain string chunk (no links inside).
+  const pushFormatted = (str) => {
+    str.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/g).forEach((part) => {
+      if (!part) return;
+      if (part.startsWith("**") && part.endsWith("**")) {
+        out.push(<strong key={key++}>{part.slice(2, -2)}</strong>);
+      } else if (part.startsWith("*") && part.endsWith("*")) {
+        out.push(<em key={key++}>{part.slice(1, -1)}</em>);
+      } else {
+        out.push(part);
+      }
+    });
+  };
+
+  const linkRe = /\[([^\]]+)\]\(([^)]+)\)/g;
+  let last = 0;
+  let m;
+  while ((m = linkRe.exec(text || "")) !== null) {
+    if (m.index > last) pushFormatted(text.slice(last, m.index));
+    const [, label, target] = m;
+    const custom = resolveLink?.(label, target, key);
+    if (custom) {
+      out.push(custom);
+      key++;
+    } else if (target === "contact") {
+      out.push(
+        <a
+          key={key++}
+          href={pathFor("contact")}
+          onClick={(e) => {
+            e.preventDefault();
+            selectTab?.("home", "contact");
+          }}
+        >
+          {label}
+        </a>
+      );
+    } else {
+      out.push(
+        <a key={key++} href={target} target="_blank" rel="noopener noreferrer">
+          {label}
+        </a>
+      );
+    }
+    last = m.index + m[0].length;
+  }
+  if (text && last < text.length) pushFormatted(text.slice(last));
+  return out;
+};
 
 // WhatsApp deep-link needs digits only (no leading "+").
 const waNumber = (phone) => dialNumber(phone).replace(/\D/g, "");
@@ -81,17 +153,21 @@ const showLocation = (map, marker, loc) => {
 };
 
 export default function Home(props) {
-  // useTina makes the content live-editable inside the Tina admin iframe.
-  const { data } = useTina({
-    query: props.query,
-    variables: props.variables,
-    data: props.data,
-  });
+  // Each section is its own Tina document; useTina makes each one live-editable
+  // inside the Tina admin iframe. One hook per section keeps them independent.
+  const { data: heroData } = useTina(props.hero);
+  const { data: aboutData } = useTina(props.about);
+  const { data: servicesData } = useTina(props.services);
+  const { data: reikiData } = useTina(props.reiki);
+  const { data: soulHealingData } = useTina(props.soulHealing);
+  const { data: contactData } = useTina(props.contact);
 
-  const hero = data.page.hero;
-  const about = data.page.about;
-  const services = data.page.services;
-  const contact = data.page.contact;
+  const hero = heroData.hero;
+  const about = aboutData.about;
+  const services = servicesData.services;
+  const reiki = reikiData.reiki;
+  const soulHealing = soulHealingData.soulHealing;
+  const contact = contactData.contact;
 
   // ── Tab navigation ────────────────────────────────────────────────
   // Default to "home" so the server-rendered HTML matches (good for SEO and
@@ -161,6 +237,43 @@ export default function Home(props) {
 
   const copyEmail = () => copyToClipboard(contact.email, "Email address");
   const copyPhone = () => copyToClipboard(dialNumber(contact.phone), "Phone number");
+
+  // Resolves the special links used inside the editable booking sentences so the
+  // surrounding copy stays plain text in Tina while the links keep their
+  // behaviour: [WhatsApp](whatsapp), [Email](email) (a mailto on touch, a
+  // copy-to-clipboard button on desktop) and [The Integration Room](integration-room).
+  const resolveBookingLink = (label, target, key) => {
+    if (target === "whatsapp") {
+      return (
+        <a key={key} href={`https://wa.me/${waNumber(contact.phone)}`} target="_blank" rel="noopener noreferrer">
+          {label}
+        </a>
+      );
+    }
+    if (target === "email") {
+      return isTouchDevice ? (
+        <a key={key} href={`mailto:${contact.email}`}>{label}</a>
+      ) : (
+        <button
+          key={key}
+          type="button"
+          className="contact__copy contact__copy--inline"
+          onClick={copyEmail}
+          aria-label={`Copy email address ${contact.email} to clipboard`}
+        >
+          {label}
+        </button>
+      );
+    }
+    if (target === "integration-room") {
+      return (
+        <a key={key} href={contact.integrationRoomUrl} target="_blank" rel="noopener noreferrer" data-tina-field={tinaField(contact, "integrationRoomUrl")}>
+          {label}
+        </a>
+      );
+    }
+    return null; // fall back to default [contact]/external handling
+  };
 
   useEffect(() => {
     const applyFromPath = () => {
@@ -498,8 +611,8 @@ export default function Home(props) {
           <section id="services" className="section services">
             <div className="container">
             <div className="section__head">
-              <p className="section__eyebrow" data-tina-field={tinaField(contact, "eyebrow")}>{services.eyebrow}</p>
-              <h2 className="section__title" data-tina-field={tinaField(contact, "title")}>{services.title}</h2>
+              <p className="section__eyebrow" data-tina-field={tinaField(services, "eyebrow")}>{services.eyebrow}</p>
+              <h2 className="section__title" data-tina-field={tinaField(services, "title")}>{services.title}</h2>
                 <p className="section__lead" data-tina-field={tinaField(services, "lead")}>
                   {services.lead}
                 </p>
@@ -571,102 +684,72 @@ export default function Home(props) {
           </div>
         </section>
 
-        {/* ===================== REIKI (placeholder — copy to be added later) ===================== */}
+        {/* ===================== REIKI (Tina-editable) ===================== */}
         <section {...panelProps("reiki", "section service-page")}>
           <div className="container">
             <div className="section__head">
-              <p className="section__eyebrow">Rest & Replenish</p>
-              <h2 className="section__title">Reiki</h2>
-              <p className="section__lead">
-                Healing is a process in which deeper layers are resolved with each treatment.
-                It is highly recommended to allow for at least four Reiki sessions.
-                That said, even a single treatment can bring profound relief and you are welcome to come for one-off sessions as well.
+              {reiki.eyebrow && (
+                <p className="section__eyebrow" data-tina-field={tinaField(reiki, "eyebrow")}>{reiki.eyebrow}</p>
+              )}
+              <h2 className="section__title" data-tina-field={tinaField(reiki, "title")}>{reiki.title}</h2>
+              <p className="section__lead" data-tina-field={tinaField(reiki, "lead")}>
+                {reiki.lead}
               </p>
             </div>
 
             <div className="service-page__body">
-              <h3>What is Reiki?</h3>
-              <p>
-               Reiki is a method for working with the body’s energy system to stimulate its natural healing abilities,
-                established in Japan in 1922 by Mikao Usui. The word Reiki (霊 Rei–spirit; 気 Ki–energy, life force) describes
-                the universal energy that flows through all life and matter, which we work with during the treatment.
-                A Reiki treatment is the process of receiving and letting this energy flow from the “天 Ten”
-                (universe, heavens, cosmos) through the practitioner and to the patient,
-                assisting and enhancing the body’s inherent capacity to heal.
-              </p>
-              <h3>What is a Reiki Session Like?</h3>
-              <p>
-                Receiving Reiki is a deeply restful and restorative experience.
-                You remain fully clothed and lie on a treatment table while Reiki is applied through
-                gentle touch. Of course, if you prefer not to be touched,
-                this is completely respected and Reiki can be offered just above the body.
-              </p>
-              <h3>My Approach</h3>
-              <p>
-                My therapeutic work is rooted in the belief that healing is an embodied process
-                integrating the emotional, mental and physical self. My intention is to offer
-                a nurturing, trauma-informed space that allows you to meet yourself with compassion
-                and acceptance of your emotional and somatic experiences that may arise during the
-                treatment. My work with Reiki is grounded and deeply attuned to your body&apos;s
-                energy system. By assisting your body&apos;s inherent healing ability,
-                we create a safe space for you to release energetic and emotional blockages,
-                allowing your body&apos;s natural intelligence to replenish its energy stores.
-              </p>
-              <h3>Reiki Jin Kei Do</h3>
-              <p className="service-page__gloss">
-                <em>Jin–compassion; Kei–wisdom; Do–way, path</em>
-              </p>
-              <p>
-                I trained in a Reiki lineage called Jin Kei Do,
-                the path of compassion and wisdom, passed from Mikao Usui,
-                Dr Chujiro Hayashi, Venerable Takeuchi, Venerable Seiji Takamori,
-                Dr Ranga Premaratna and Edith Anny Izsak.
-                This path, influenced by the principles of Zen monks Takeuchi and Takamori,
-                and further deepened by Takamori&apos;s immersion in Tibetan Buddhism,
-                emphasises personal cultivation to bring harmony and connection of the heart
-                (compassion) and mind (wisdom). This growth is cultivated through meditation,
-                various Qigong exercises (Qi is the Chinese equivalent to the Japanese word Ki)
-                and mindful integration of these principles in one&apos;s life.
-              </p>
-              <a href={pathFor("contact")} className="btn btn--primary" onClick={(e) => { e.preventDefault(); selectTab("home", "contact"); }}>
-                Contact me
+              {reiki.sections?.map((s, i) => (
+                <Fragment key={i}>
+                  <h3 data-tina-field={tinaField(s, "heading")}>{s.heading}</h3>
+                  {s.gloss && (
+                    <p className="service-page__gloss" data-tina-field={tinaField(s, "gloss")}>
+                      {renderInline(s.gloss, { selectTab })}
+                    </p>
+                  )}
+                  <p data-tina-field={tinaField(s, "body")}>{renderInline(s.body, { selectTab })}</p>
+                </Fragment>
+              ))}
+              <a href={pathFor("contact")} className="btn btn--primary" onClick={(e) => { e.preventDefault(); selectTab("home", "contact"); }} data-tina-field={tinaField(reiki, "cta")}>
+                {reiki.cta}
               </a>
             </div>
           </div>
         </section>
 
-        {/* ===================== SOUL HEALING (placeholder — copy to be added later) ===================== */}
+        {/* ===================== SOUL HEALING (Tina-editable) ===================== */}
         <section {...panelProps("soul-healing", "section service-page")}>
           <div className="container">
             <div className="section__head">
-              {/*<p className="section__eyebrow">Inner Work</p>*/}
-              <h2 className="section__title">Soul Healing</h2>
-              {/*<p className="section__lead">*/}
-              {/*  A deeper, intuitive session to help release old patterns and*/}
-              {/*  reconnect with your inner self — bringing clarity, lightness, and grounding.*/}
-              {/*</p>*/}
+              {soulHealing.eyebrow && (
+                <p className="section__eyebrow" data-tina-field={tinaField(soulHealing, "eyebrow")}>{soulHealing.eyebrow}</p>
+              )}
+              <h2 className="section__title" data-tina-field={tinaField(soulHealing, "title")}>{soulHealing.title}</h2>
+              {soulHealing.lead && (
+                <p className="section__lead" data-tina-field={tinaField(soulHealing, "lead")}>
+                  {soulHealing.lead}
+                </p>
+              )}
             </div>
 
             <div className="service-page__body">
-              {/*<h3>What is Soul Healing?</h3>*/}
-              <p>
-                <em>I am currently undergoing an intensive training in Esoteric Soul Healing.
-                  As part of this training, I am <strong>offering free sessions</strong> (which also allow me to practice).
-                </em>
-              </p>
-              <p>
-                <em>I can welcome four new people approximately every six weeks.
-                  If you are interested in participating, or have any questions, you are invited to <a href={pathFor("contact")} onClick={(e) => { e.preventDefault(); selectTab("home", "contact"); }}>contact me</a>.
-                </em>
-              </p>
-              <p>
-                Esoteric Soul Healing is a form of energy healing that works with the energies of the whole person—the physical and energetic bodies, emotions, thoughts, personality and Soul.
-                The Soul is the part of us that is eternal, connects us to each other, the divine and all life, and is filled with universal love. Healing is a process of returning to “wholeness” within yourself by redressing imbalances that have built up in the emotions, mind and body.
-                Soul Healers recognise the presence of the Soul in all people and work with these powerfully transformative energies to facilitate people in their healing.
-                With gratitude for the teachers of this path: Karin Persons, Kathy Jones and Alice Bailey.
-              </p>
-              <a href={pathFor("contact")} className="btn btn--primary" onClick={(e) => { e.preventDefault(); selectTab("home", "contact"); }}>
-                Contact me
+              {soulHealing.intro?.map((para, i) => (
+                <p key={`intro-${i}`} data-tina-field={tinaField(soulHealing, "intro")}>
+                  <em>{renderInline(para, { selectTab })}</em>
+                </p>
+              ))}
+              {soulHealing.sections?.map((s, i) => (
+                <Fragment key={i}>
+                  <h3 data-tina-field={tinaField(s, "heading")}>{s.heading}</h3>
+                  {s.gloss && (
+                    <p className="service-page__gloss" data-tina-field={tinaField(s, "gloss")}>
+                      {renderInline(s.gloss, { selectTab })}
+                    </p>
+                  )}
+                  <p data-tina-field={tinaField(s, "body")}>{renderInline(s.body, { selectTab })}</p>
+                </Fragment>
+              ))}
+              <a href={pathFor("contact")} className="btn btn--primary" onClick={(e) => { e.preventDefault(); selectTab("home", "contact"); }} data-tina-field={tinaField(soulHealing, "cta")}>
+                {soulHealing.cta}
               </a>
             </div>
           </div>
@@ -748,23 +831,11 @@ export default function Home(props) {
 
               <div className="contact__schedule">
                 <h3 className="contact__subtitle" data-tina-field={tinaField(contact, "bookingTitle")}>{contact.bookingTitle}</h3>
-                <p>
-                  For treatments in Leiden, please contact me via{" "}
-                  <a href={`https://wa.me/${waNumber(contact.phone)}`} target="_blank" rel="noopener noreferrer">WhatsApp</a>{" "}
-                  or{" "}
-                  {isTouchDevice ? (
-                    <a href={`mailto:${contact.email}`}>Email</a>
-                  ) : (
-                    <button type="button" className="contact__copy contact__copy--inline" onClick={copyEmail} aria-label={`Copy email address ${contact.email} to clipboard`}>
-                      Email
-                    </button>
-                  )}{" "}
-                  for scheduling and availability.
+                <p data-tina-field={tinaField(contact, "bookingLeiden")}>
+                  {renderInline(contact.bookingLeiden, { selectTab, resolveLink: resolveBookingLink })}
                 </p>
-                <p>
-                  For treatments in Amsterdam, please refer to{" "}
-                  <a href={contact.integrationRoomUrl} target="_blank" rel="noopener noreferrer" data-tina-field={tinaField(contact, "integrationRoomUrl")}>The Integration Room</a>{" "}
-                  clinic's website for their updated pricing and booking.
+                <p data-tina-field={tinaField(contact, "bookingAmsterdam")}>
+                  {renderInline(contact.bookingAmsterdam, { selectTab, resolveLink: resolveBookingLink })}
                 </p>
                 <p data-tina-field={tinaField(contact, "bookingHomeNote")}><em>{contact.bookingHomeNote}</em></p>
               </div>
@@ -822,17 +893,51 @@ export default function Home(props) {
   );
 }
 
-// Pull the content from content/pages/home.json through Tina at build time.
-export const getStaticProps = async () => {
-  const res = await client.queries.page({ relativePath: "home.json" });
+// Build static props from the committed content files rather than querying Tina
+// Cloud at build time. After a schema change Tina Cloud re-indexes the branch
+// asynchronously *after* the push, so a cloud query during the deploy build can
+// race ahead of indexing and fail ("Cannot query field …"). Reading the local
+// JSON (which is exactly what Tina commits to git) makes the build deterministic.
+// The generated query string + variables are still handed to useTina so inline
+// editing in /admin keeps working — there it re-fetches live from Tina Cloud
+// client-side, by which point indexing has caught up.
+const readSection = (folder, field, query) => {
+  const relativePath = "index.json";
+  const file = path.join(process.cwd(), "content", folder, relativePath);
+  const values = JSON.parse(fs.readFileSync(file, "utf8"));
+  const typename = field.charAt(0).toUpperCase() + field.slice(1);
   return {
-    props: {
-      data: res.data,
-      query: res.query,
-      variables: res.variables,
+    query,
+    variables: { relativePath },
+    data: {
+      [field]: {
+        __typename: typename,
+        id: `content/${folder}/${relativePath}`,
+        _sys: {
+          filename: "index",
+          basename: "index.json",
+          hasReferences: false,
+          breadcrumbs: ["index"],
+          path: `content/${folder}/${relativePath}`,
+          relativePath,
+          extension: ".json",
+        },
+        ...values,
+      },
     },
   };
 };
+
+export const getStaticProps = async () => ({
+  props: {
+    hero: readSection("hero", "hero", HeroDocument),
+    about: readSection("about", "about", AboutDocument),
+    services: readSection("services", "services", ServicesDocument),
+    reiki: readSection("reiki", "reiki", ReikiDocument),
+    soulHealing: readSection("soul-healing", "soulHealing", SoulHealingDocument),
+    contact: readSection("contact", "contact", ContactDocument),
+  },
+});
 
 
 
