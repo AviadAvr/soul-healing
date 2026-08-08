@@ -229,6 +229,22 @@ export default defineConfig({
           { type: "string", name: "integrationRoomUrl", label: "The Integration Room URL" },
           {
             type: "string",
+            name: "bookingLeiden",
+            label: "Booking · Leiden note",
+            ui: { component: "textarea" },
+            description:
+              "Use [WhatsApp](whatsapp), [Email](email) and [contact me](contact) for the special links. Also supports *italic* / **bold**.",
+          },
+          {
+            type: "string",
+            name: "bookingAmsterdam",
+            label: "Booking · Amsterdam note",
+            ui: { component: "textarea" },
+            description:
+              "Use [The Integration Room](integration-room) to link to the URL above. Also supports *italic* / **bold** and [external links](https://…).",
+          },
+          {
+            type: "string",
             name: "bookingHomeNote",
             label: "Home-visit note",
             ui: { component: "textarea" },

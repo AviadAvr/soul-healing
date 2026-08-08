@@ -35,10 +35,15 @@ const withEmphasis = (text) =>
   );
 
 // Richer inline renderer for body copy: supports **bold**, *italic* and
-// [label](target) links. A target of "contact" opens the Contact section on the
-// Home tab; anything else is treated as an external URL. Everything stays plain,
-// editable text in Tina — no raw HTML. `selectTab` wires up the internal link.
-const renderInline = (text, selectTab) => {
+// [label](target) links. Pass a context object:
+//   { selectTab, resolveLink }
+// `resolveLink(label, target, key)` lets the caller render special links (e.g.
+// WhatsApp / Email / a stored URL) and should return a React element, or a
+// falsy value to fall back to the defaults below. A target of "contact" opens
+// the Contact section on the Home tab; anything else is treated as an external
+// URL. Everything stays plain, editable text in Tina — no raw HTML.
+const renderInline = (text, ctx = {}) => {
+  const { selectTab, resolveLink } = ctx;
   const out = [];
   let key = 0;
 
@@ -62,7 +67,11 @@ const renderInline = (text, selectTab) => {
   while ((m = linkRe.exec(text || "")) !== null) {
     if (m.index > last) pushFormatted(text.slice(last, m.index));
     const [, label, target] = m;
-    if (target === "contact") {
+    const custom = resolveLink?.(label, target, key);
+    if (custom) {
+      out.push(custom);
+      key++;
+    } else if (target === "contact") {
       out.push(
         <a
           key={key++}
@@ -219,6 +228,43 @@ export default function Home(props) {
 
   const copyEmail = () => copyToClipboard(contact.email, "Email address");
   const copyPhone = () => copyToClipboard(dialNumber(contact.phone), "Phone number");
+
+  // Resolves the special links used inside the editable booking sentences so the
+  // surrounding copy stays plain text in Tina while the links keep their
+  // behaviour: [WhatsApp](whatsapp), [Email](email) (a mailto on touch, a
+  // copy-to-clipboard button on desktop) and [The Integration Room](integration-room).
+  const resolveBookingLink = (label, target, key) => {
+    if (target === "whatsapp") {
+      return (
+        <a key={key} href={`https://wa.me/${waNumber(contact.phone)}`} target="_blank" rel="noopener noreferrer">
+          {label}
+        </a>
+      );
+    }
+    if (target === "email") {
+      return isTouchDevice ? (
+        <a key={key} href={`mailto:${contact.email}`}>{label}</a>
+      ) : (
+        <button
+          key={key}
+          type="button"
+          className="contact__copy contact__copy--inline"
+          onClick={copyEmail}
+          aria-label={`Copy email address ${contact.email} to clipboard`}
+        >
+          {label}
+        </button>
+      );
+    }
+    if (target === "integration-room") {
+      return (
+        <a key={key} href={contact.integrationRoomUrl} target="_blank" rel="noopener noreferrer" data-tina-field={tinaField(contact, "integrationRoomUrl")}>
+          {label}
+        </a>
+      );
+    }
+    return null; // fall back to default [contact]/external handling
+  };
 
   useEffect(() => {
     const applyFromPath = () => {
@@ -648,10 +694,10 @@ export default function Home(props) {
                   <h3 data-tina-field={tinaField(s, "heading")}>{s.heading}</h3>
                   {s.gloss && (
                     <p className="service-page__gloss" data-tina-field={tinaField(s, "gloss")}>
-                      {renderInline(s.gloss, selectTab)}
+                      {renderInline(s.gloss, { selectTab })}
                     </p>
                   )}
-                  <p data-tina-field={tinaField(s, "body")}>{renderInline(s.body, selectTab)}</p>
+                  <p data-tina-field={tinaField(s, "body")}>{renderInline(s.body, { selectTab })}</p>
                 </Fragment>
               ))}
               <a href={pathFor("contact")} className="btn btn--primary" onClick={(e) => { e.preventDefault(); selectTab("home", "contact"); }} data-tina-field={tinaField(reiki, "cta")}>
@@ -674,12 +720,12 @@ export default function Home(props) {
             <div className="service-page__body">
               {soulHealing.intro?.map((para, i) => (
                 <p key={`intro-${i}`} data-tina-field={tinaField(soulHealing, "intro")}>
-                  <em>{renderInline(para, selectTab)}</em>
+                  <em>{renderInline(para, { selectTab })}</em>
                 </p>
               ))}
               {soulHealing.body?.map((para, i) => (
                 <p key={`body-${i}`} data-tina-field={tinaField(soulHealing, "body")}>
-                  {renderInline(para, selectTab)}
+                  {renderInline(para, { selectTab })}
                 </p>
               ))}
               <a href={pathFor("contact")} className="btn btn--primary" onClick={(e) => { e.preventDefault(); selectTab("home", "contact"); }} data-tina-field={tinaField(soulHealing, "cta")}>
@@ -765,23 +811,11 @@ export default function Home(props) {
 
               <div className="contact__schedule">
                 <h3 className="contact__subtitle" data-tina-field={tinaField(contact, "bookingTitle")}>{contact.bookingTitle}</h3>
-                <p>
-                  For treatments in Leiden, please contact me via{" "}
-                  <a href={`https://wa.me/${waNumber(contact.phone)}`} target="_blank" rel="noopener noreferrer">WhatsApp</a>{" "}
-                  or{" "}
-                  {isTouchDevice ? (
-                    <a href={`mailto:${contact.email}`}>Email</a>
-                  ) : (
-                    <button type="button" className="contact__copy contact__copy--inline" onClick={copyEmail} aria-label={`Copy email address ${contact.email} to clipboard`}>
-                      Email
-                    </button>
-                  )}{" "}
-                  for scheduling and availability.
+                <p data-tina-field={tinaField(contact, "bookingLeiden")}>
+                  {renderInline(contact.bookingLeiden, { selectTab, resolveLink: resolveBookingLink })}
                 </p>
-                <p>
-                  For treatments in Amsterdam, please refer to{" "}
-                  <a href={contact.integrationRoomUrl} target="_blank" rel="noopener noreferrer" data-tina-field={tinaField(contact, "integrationRoomUrl")}>The Integration Room</a>{" "}
-                  clinic's website for their updated pricing and booking.
+                <p data-tina-field={tinaField(contact, "bookingAmsterdam")}>
+                  {renderInline(contact.bookingAmsterdam, { selectTab, resolveLink: resolveBookingLink })}
                 </p>
                 <p data-tina-field={tinaField(contact, "bookingHomeNote")}><em>{contact.bookingHomeNote}</em></p>
               </div>
