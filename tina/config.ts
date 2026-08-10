@@ -22,12 +22,18 @@ export default defineConfig({
   // Tina Cloud project id. Safe to hardcode/commit: it's a public identifier that
   // Next inlines into the client bundle and bakes into public/admin/ anyway, and
   // it grants no access on its own (editors authorise via GitHub through Tina
-  // Cloud). No read-only content token is needed either — build-time content is
-  // read from the local content/ JSON files (see getStaticProps in pages/index.js).
-  // An env var still wins if set, e.g. to point a fork at its own project.
+  // Cloud). An env var still wins if set, e.g. to point a fork at its own project.
   clientId:
     process.env.NEXT_PUBLIC_TINA_CLIENT_ID ||
     "f4f06805-ae00-4277-b9ed-2431424e82a5",
+
+  // Read-only Tina Cloud content token. Required at *build time* by `tinacms
+  // build` to generate the client and the /admin editor for this cloud project.
+  // It is a server-side secret (never shipped to the browser) and must be
+  // provided as an env var / CI secret — it is intentionally NOT committed.
+  // (Site content itself is read from the local content/ JSON at build time, see
+  // getStaticProps in pages/index.js, so this token is only for the CMS build.)
+  token: process.env.TINA_TOKEN,
 
   build: {
     outputFolder: "admin", // editor available at /admin

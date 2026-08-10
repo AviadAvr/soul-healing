@@ -84,17 +84,21 @@ python scripts/make-logo.py          # or just one asset
 ## Deploy
 
 Pushing to `main` triggers `.github/workflows/deploy.yml`, which builds on Linux
-and publishes `./out` to GitHub Pages. One one-time repo setting is required:
+and publishes `./out` to GitHub Pages. Two one-time repo settings are required:
 
 1. **Settings → Pages → Source = GitHub Actions.**
+2. **Settings → Secrets and variables → Actions** — add `TINA_TOKEN` (a read-only
+   content token from your Tina Cloud project). This is required by `tinacms
+   build` to generate the client and the `/admin` editor. It's a build-time,
+   server-side secret and is never shipped to the browser.
 
-No Tina secrets are needed: the Tina Cloud Client ID is a public identifier
-hardcoded in `tina/config.ts`, and build-time content is read from the local
-`content/` JSON files rather than fetched from Tina Cloud. (Both can still be
-overridden with `NEXT_PUBLIC_TINA_CLIENT_ID` if a fork wants its own project.)
-The contact-page map uses `NEXT_PUBLIC_JAWG_TOKEN` — another public,
-build-time-inlined value; set it in `.env` (and as an Actions secret if you want
-the map tiles to render in production).
+The Tina Cloud **Client ID** is a public identifier hardcoded in
+`tina/config.ts` (override with `NEXT_PUBLIC_TINA_CLIENT_ID` for a fork), so it
+is *not* a secret. Site content is read from the local `content/` JSON files at
+build time rather than fetched from Tina Cloud, so the token is only for building
+the CMS/admin. The contact-page map uses `NEXT_PUBLIC_JAWG_TOKEN` — another
+public, build-time-inlined value; set it in `.env` (and as an Actions secret if
+you want the map tiles to render in production).
 
 The live site is served from the root of the custom domain
 (`https://soul-pathways.com/`). The `public/CNAME` file tells GitHub Pages which
