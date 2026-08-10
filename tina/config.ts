@@ -19,9 +19,15 @@ const sectionUi = (tab: string) => ({
 export default defineConfig({
   branch,
 
-  // Tina Cloud credentials (from .env). Leave undefined to run in local mode.
-  clientId: process.env.NEXT_PUBLIC_TINA_CLIENT_ID,
-  token: process.env.TINA_TOKEN,
+  // Tina Cloud project id. Safe to hardcode/commit: it's a public identifier that
+  // Next inlines into the client bundle and bakes into public/admin/ anyway, and
+  // it grants no access on its own (editors authorise via GitHub through Tina
+  // Cloud). No read-only content token is needed either — build-time content is
+  // read from the local content/ JSON files (see getStaticProps in pages/index.js).
+  // An env var still wins if set, e.g. to point a fork at its own project.
+  clientId:
+    process.env.NEXT_PUBLIC_TINA_CLIENT_ID ||
+    "f4f06805-ae00-4277-b9ed-2431424e82a5",
 
   build: {
     outputFolder: "admin", // editor available at /admin

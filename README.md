@@ -84,11 +84,17 @@ python scripts/make-logo.py          # or just one asset
 ## Deploy
 
 Pushing to `main` triggers `.github/workflows/deploy.yml`, which builds on Linux
-and publishes `./out` to GitHub Pages. Two one-time repo settings are required:
+and publishes `./out` to GitHub Pages. One one-time repo setting is required:
 
 1. **Settings → Pages → Source = GitHub Actions.**
-2. **Settings → Secrets and variables → Actions** — add `NEXT_PUBLIC_TINA_CLIENT_ID`
-   and `TINA_TOKEN` (from your Tina Cloud project).
+
+No Tina secrets are needed: the Tina Cloud Client ID is a public identifier
+hardcoded in `tina/config.ts`, and build-time content is read from the local
+`content/` JSON files rather than fetched from Tina Cloud. (Both can still be
+overridden with `NEXT_PUBLIC_TINA_CLIENT_ID` if a fork wants its own project.)
+The contact-page map uses `NEXT_PUBLIC_JAWG_TOKEN` — another public,
+build-time-inlined value; set it in `.env` (and as an Actions secret if you want
+the map tiles to render in production).
 
 The live site is served from the root of the custom domain
 (`https://soul-pathways.com/`). The `public/CNAME` file tells GitHub Pages which
