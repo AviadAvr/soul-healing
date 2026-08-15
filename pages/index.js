@@ -458,6 +458,88 @@ export default function Home(props) {
     hidden: activeTab !== id,
   });
 
+  // ── SEO structured data (schema.org JSON-LD) ──────────────────────
+  const SITE_URL = "https://soul-pathways.com/";
+  const primaryLocation =
+    LOCATIONS.find((l) => l.id === DEFAULT_LOCATION_ID) || LOCATIONS[0];
+  const serviceArea = LOCATIONS.map((location) => ({
+    "@type": "Place",
+    name: location.label,
+  }));
+  const structuredData = [
+    // ── Business ─────────────────────────────────────────────────────
+    {
+      "@context": "https://schema.org",
+      "@type": "HealthAndBeautyBusiness",
+      "@id": `${SITE_URL}#business`,
+      name: "Soul Pathways",
+      description:
+          "Soul Pathways offers Reiki and holistic therapy in Leiden and Amsterdam.",
+      url: SITE_URL,
+      logo: `${SITE_URL}static/logo/soul-pathways-logo.svg`,
+      image: `${SITE_URL}static/images/og-preview.jpg`,
+      telephone: dialNumber(contact.phone),
+      email: contact.email,
+      priceRange: "€",
+      address: {
+        "@type": "PostalAddress",
+        streetAddress: "Van der Werfstraat",
+        postalCode: "2312VS",
+        addressLocality: primaryLocation.label,
+        addressCountry: "NL"
+      },
+      areaServed: serviceArea,
+      geo: {
+        "@type": "GeoCoordinates",
+        latitude: primaryLocation.coords[0],
+        longitude: primaryLocation.coords[1],
+      },
+      hasOfferCatalog: {
+        "@type": "OfferCatalog",
+        name: "Soul Pathways Therapy",
+        itemListElement: [
+          {
+            "@type": "Offer",
+            itemOffered: {
+              "@type": "Service",
+              "@id": `${SITE_URL}reiki/#service`,
+              name: "Reiki",
+              url: `${SITE_URL}reiki/`,
+              provider: {
+                "@id": `${SITE_URL}#business`,
+              },
+              areaServed: serviceArea,
+            },
+          },
+          {
+            "@type": "Offer",
+            itemOffered: {
+              "@type": "Service",
+              "@id": `${SITE_URL}services/#therapy`,
+              name: "Therapy",
+              url: `${SITE_URL}services/`,
+              provider: {
+                "@id": `${SITE_URL}#business`,
+              },
+              areaServed: serviceArea,
+            },
+          },
+        ],
+      },
+    },
+    // ── Website ──────────────────────────────────────────────────────
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "@id": `${SITE_URL}#website`,
+      name: "Soul Pathways",
+      url: SITE_URL,
+      publisher: {
+        "@id": `${SITE_URL}#business`,
+      },
+    },
+  ];
+
   return (
     <>
       <Head>
@@ -465,9 +547,15 @@ export default function Home(props) {
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta
           name="description"
-          content="Soul Pathways — Reiki and Soul Healing in Leiden. Reconnect with a deeper sense of balance, presence and wellbeing in your life."
+          content="Soul Pathways — Reiki and holistic therapy in Leiden, with treatments also available in Amsterdam. Reconnect with balance, presence and wellbeing."
         />
         <title>Soul Pathways — Reiki &amp; Soul Healing in Leiden</title>
+
+        {/* Structured data (JSON-LD) for search engines */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
 
         {/* Open Graph / social preview */}
         <meta property="og:type" content="website" />
@@ -503,6 +591,7 @@ export default function Home(props) {
         />
 
         <meta name="theme-color" content="#7d9b78" />
+        <link rel="canonical" href="https://soul-pathways.com/" />
         <link rel="icon" type="image/svg+xml" href={`${PREFIX}/static/icons/favicon.svg`} />
 
         {/* Google Fonts */}
