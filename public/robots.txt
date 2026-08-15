@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://soul-pathways.com/sitemap.xml
+
