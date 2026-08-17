@@ -511,9 +511,9 @@ h3 {
 }
 
 .about__highlights li::before {
-    content: "✦";
+    /*content: "✦";*/
     /*content: "꩜";*/
-    /*content: "•";*/
+    content: "•";
     position: absolute;
     left: 0;
     color: var(--c-sage);

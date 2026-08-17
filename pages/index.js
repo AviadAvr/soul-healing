@@ -547,9 +547,9 @@ export default function Home(props) {
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta
           name="description"
-          content="Soul Pathways — Reiki and holistic therapy in Leiden, with treatments also available in Amsterdam. Reconnect with balance, presence and wellbeing."
+          content="Reiki and energy healing in Leiden and Amsterdam. Get back in touch with your Self – Reconnect with a deeper sense of balance, presence and wellbeing in your life."
         />
-        <title>Soul Pathways — Reiki &amp; Soul Healing in Leiden</title>
+        <title>Soul Pathways - Reiki &amp; Soul Healing in Leiden</title>
 
         {/* Structured data (JSON-LD) for search engines */}
         <script
@@ -562,7 +562,7 @@ export default function Home(props) {
         <meta property="og:site_name" content="Soul Pathways" />
         <meta
           property="og:title"
-          content="Soul Pathways — Reiki & Soul Healing in Leiden"
+          content="Soul Pathways - Reiki & Soul Healing in Leiden"
         />
         <meta
           property="og:description"
@@ -581,7 +581,7 @@ export default function Home(props) {
         <meta property="og:image:height" content="630" />
         <meta
           property="og:image:alt"
-          content="Soul Pathways — Reiki & Soul Healing in Leiden"
+          content="Soul Pathways - Reiki & Soul Healing in Leiden"
         />
         <meta property="og:url" content="https://soul-pathways.com/" />
         <meta name="twitter:card" content="summary_large_image" />
