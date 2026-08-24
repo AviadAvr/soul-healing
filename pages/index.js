@@ -1,17 +1,8 @@
 import Head from "next/head";
 import Script from "next/script";
-import fs from "fs";
-import path from "path";
 import { Fragment, useEffect, useRef, useState } from "react";
 import { useTina, tinaField } from "tinacms/dist/react";
-import {
-  HeroDocument,
-  AboutDocument,
-  ServicesDocument,
-  ReikiDocument,
-  SoulHealingDocument,
-  ContactDocument,
-} from "../tina/__generated__/types";
+import { makeStaticProps } from "../lib/content";
 
 // Plain <img>/<link>/<script> srcs are NOT auto-prefixed with basePath the way
 // next/link and next/image are, so we prefix them manually for GitHub Pages.
@@ -152,7 +143,54 @@ const showLocation = (map, marker, loc) => {
   marker.openPopup();
 };
 
+// Per-page SEO. Each real page (home/about/reiki/soul-healing) is served as its
+// own static document with a unique title, description and a *self-referencing*
+// canonical, so Google indexes them independently instead of treating them as
+// alternates of the homepage. Open Graph stays identical across pages by design.
+const SITE = "https://soul-pathways.com";
+const PAGE_SEO = {
+  home: {
+    title: "Soul Pathways - Reiki & Soul Healing in Leiden",
+    description:
+      "Reiki and energy healing in Leiden and Amsterdam. Get back in touch with your Self – Reconnect with a deeper sense of balance, presence and wellbeing in your life.",
+    canonical: `${SITE}/`,
+  },
+  about: {
+    title: "About Yonina | Soul Pathways",
+    description:
+      "Meet Yonina of Soul Pathways — an MSc Clinical Psychologist and energy healing practitioner offering nurturing, trauma-informed Reiki and Soul Healing in Leiden and Amsterdam.",
+    canonical: `${SITE}/about/`,
+  },
+  reiki: {
+    title: "Reiki Healing in Leiden & Amsterdam | Soul Pathways",
+    description:
+      "Reiki energy healing with Soul Pathways in Leiden and Amsterdam. Gentle, trauma-informed sessions that support your body's natural capacity to heal and restore balance.",
+    canonical: `${SITE}/reiki/`,
+  },
+  "soul-healing": {
+    title: "Soul Healing in Leiden & Amsterdam | Soul Pathways",
+    description:
+      "Esoteric Soul Healing with Soul Pathways in Leiden and Amsterdam. Energy healing that works with the whole person to restore a deeper sense of wholeness and balance.",
+    canonical: `${SITE}/soul-healing/`,
+  },
+};
+
 export default function Home(props) {
+  // Which real page this document represents. Drives the SEO metadata, the
+  // initial (server-rendered) tab and the unique <h1>. Services/Contact live at
+  // the bottom of Home, so they render as the "home" document.
+  const page = props.page || "home";
+  const seo = PAGE_SEO[page] || PAGE_SEO.home;
+  const initialTab = TABS.includes(page) ? page : "home";
+
+  // The section title that is this page's primary heading is rendered as an
+  // <h1>; every other (hidden) panel keeps its <h2>. Styling is class-based
+  // (.hero__title / .section__title), so the tag swap is visually invisible.
+  const HeroTitleTag = page === "home" ? "h1" : "h2";
+  const AboutTitleTag = page === "about" ? "h1" : "h2";
+  const ReikiTitleTag = page === "reiki" ? "h1" : "h2";
+  const SoulTitleTag = page === "soul-healing" ? "h1" : "h2";
+
   // Each section is its own Tina document; useTina makes each one live-editable
   // inside the Tina admin iframe. One hook per section keeps them independent.
   const { data: heroData } = useTina(props.hero);
@@ -170,9 +208,10 @@ export default function Home(props) {
   const contact = contactData.contact;
 
   // ── Tab navigation ────────────────────────────────────────────────
-  // Default to "home" so the server-rendered HTML matches (good for SEO and
-  // first paint); on the client we sync to the URL path after hydration.
-  const [activeTab, setActiveTab] = useState("home");
+  // Boot the tab that matches this document's page so the server-rendered HTML
+  // already shows the right content (good for SEO and first paint); on the
+  // client we re-sync to the URL path after hydration.
+  const [activeTab, setActiveTab] = useState(initialTab);
 
   // ── "Copied to clipboard" toast ───────────────────────────────────
   // `label` is the message text (e.g. "Email address"); `visible` drives the
@@ -547,9 +586,9 @@ export default function Home(props) {
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta
           name="description"
-          content="Reiki and energy healing in Leiden and Amsterdam. Get back in touch with your Self – Reconnect with a deeper sense of balance, presence and wellbeing in your life."
+          content={seo.description}
         />
-        <title>Soul Pathways - Reiki &amp; Soul Healing in Leiden</title>
+        <title>{seo.title}</title>
 
         {/* Structured data (JSON-LD) for search engines */}
         <script
@@ -591,7 +630,7 @@ export default function Home(props) {
         />
 
         <meta name="theme-color" content="#7d9b78" />
-        <link rel="canonical" href="https://soul-pathways.com/" />
+        <link rel="canonical" href={seo.canonical} />
         <link rel="icon" type="image/svg+xml" href={`${PREFIX}/static/icons/favicon.svg`} />
 
         {/* Google Fonts */}
@@ -676,11 +715,11 @@ export default function Home(props) {
             <p className="hero__eyebrow" data-tina-field={tinaField(hero, "eyebrow")}>
               {hero.eyebrow}
             </p>
-            <h1 className="hero__title">
+            <HeroTitleTag className="hero__title">
               <span data-tina-field={tinaField(hero, "titleLine1")}>{hero.titleLine1}</span>
               <br />
               <span data-tina-field={tinaField(hero, "titleLine2")}>{hero.titleLine2}</span>
-            </h1>
+            </HeroTitleTag>
             <p className="hero__subtitle" data-tina-field={tinaField(hero, "subtitle")}>
               {hero.subtitle}
             </p>
@@ -749,9 +788,9 @@ export default function Home(props) {
               <p className="section__eyebrow" data-tina-field={tinaField(about, "eyebrow")}>
                 {about.eyebrow}
               </p>
-              <h2 className="section__title" data-tina-field={tinaField(about, "title")}>
+              <AboutTitleTag className="section__title" data-tina-field={tinaField(about, "title")}>
                 {about.title}
-              </h2>
+              </AboutTitleTag>
 
               <div data-tina-field={tinaField(about, "paragraphs")}>
                 {(about.paragraphs?.flatMap((para) => para.split(/\n{2,}/)) ?? []).map((para, i) => (
@@ -780,7 +819,7 @@ export default function Home(props) {
               {reiki.eyebrow && (
                 <p className="section__eyebrow" data-tina-field={tinaField(reiki, "eyebrow")}>{reiki.eyebrow}</p>
               )}
-              <h2 className="section__title" data-tina-field={tinaField(reiki, "title")}>{reiki.title}</h2>
+              <ReikiTitleTag className="section__title" data-tina-field={tinaField(reiki, "title")}>{reiki.title}</ReikiTitleTag>
               <p className="section__lead" data-tina-field={tinaField(reiki, "lead")}>
                 {reiki.lead}
               </p>
@@ -812,7 +851,7 @@ export default function Home(props) {
               {soulHealing.eyebrow && (
                 <p className="section__eyebrow" data-tina-field={tinaField(soulHealing, "eyebrow")}>{soulHealing.eyebrow}</p>
               )}
-              <h2 className="section__title" data-tina-field={tinaField(soulHealing, "title")}>{soulHealing.title}</h2>
+              <SoulTitleTag className="section__title" data-tina-field={tinaField(soulHealing, "title")}>{soulHealing.title}</SoulTitleTag>
               {soulHealing.lead && (
                 <p className="section__lead" data-tina-field={tinaField(soulHealing, "lead")}>
                   {soulHealing.lead}
@@ -982,51 +1021,8 @@ export default function Home(props) {
   );
 }
 
-// Build static props from the committed content files rather than querying Tina
-// Cloud at build time. After a schema change Tina Cloud re-indexes the branch
-// asynchronously *after* the push, so a cloud query during the deploy build can
-// race ahead of indexing and fail ("Cannot query field …"). Reading the local
-// JSON (which is exactly what Tina commits to git) makes the build deterministic.
-// The generated query string + variables are still handed to useTina so inline
-// editing in /admin keeps working — there it re-fetches live from Tina Cloud
-// client-side, by which point indexing has caught up.
-const readSection = (folder, field, query) => {
-  const relativePath = "index.json";
-  const file = path.join(process.cwd(), "content", folder, relativePath);
-  const values = JSON.parse(fs.readFileSync(file, "utf8"));
-  const typename = field.charAt(0).toUpperCase() + field.slice(1);
-  return {
-    query,
-    variables: { relativePath },
-    data: {
-      [field]: {
-        __typename: typename,
-        id: `content/${folder}/${relativePath}`,
-        _sys: {
-          filename: "index",
-          basename: "index.json",
-          hasReferences: false,
-          breadcrumbs: ["index"],
-          path: `content/${folder}/${relativePath}`,
-          relativePath,
-          extension: ".json",
-        },
-        ...values,
-      },
-    },
-  };
-};
-
-export const getStaticProps = async () => ({
-  props: {
-    hero: readSection("hero", "hero", HeroDocument),
-    about: readSection("about", "about", AboutDocument),
-    services: readSection("services", "services", ServicesDocument),
-    reiki: readSection("reiki", "reiki", ReikiDocument),
-    soulHealing: readSection("soul-healing", "soulHealing", SoulHealingDocument),
-    contact: readSection("contact", "contact", ContactDocument),
-  },
-});
+// Build static props from the committed content files (see ../lib/content).
+export const getStaticProps = makeStaticProps("home");
 
 
 
