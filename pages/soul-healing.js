@@ -1,4 +1,8 @@
-// Real pre-rendered page for the /soul-healing clean URL (200 instead of the
-// 404 fallback) so Open Graph previews work when shared. See about.js.
-export { default, getStaticProps } from "./index";
+// Independently indexable /soul-healing/ page. Re-uses the Home component (UI
+// identical to the SPA) but injects page="soul-healing" via getStaticProps for
+// its own <title>, meta description, self-referencing canonical and unique <h1>.
+export { default } from "./index";
+import { makeStaticProps } from "../lib/content";
+
+export const getStaticProps = makeStaticProps("soul-healing");
 
