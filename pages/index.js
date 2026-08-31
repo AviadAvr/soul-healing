@@ -136,8 +136,17 @@ const DEFAULT_LOCATION_ID = "leiden";
 // Point an existing Leaflet map + marker at a location (updates pin, popup & view).
 const showLocation = (map, marker, loc) => {
   marker.setLatLng(loc.coords);
+  // A link that opens the Google Maps directions URL in a new tab.
   marker.setPopupContent(
-    `<a href="${loc.url}" target="_blank" rel="noopener noreferrer">${loc.popupLabel}</a>`
+    `<a href="${loc.url}" target="_blank" rel="noopener noreferrer"` +
+      ` aria-label="Get directions to ${loc.label}" title="Get directions"` +
+      ` style="display:flex;align-items:center;gap:8px;color:#1a73e8;text-decoration:none;">` +
+      `<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30"` +
+      ` viewBox="0 -960 960 960" fill="currentColor" style="flex:0 0 auto;" aria-hidden="true">` +
+      `<path d="M320-360h80v-120h140v100l140-140-140-140v100H360q-17 0-28.5 11.5T320-520v160ZM480-80q-15 0-29.5-6T424-104L104-424q-12-12-18-26.5T80-480q0-15 6-29.5t18-26.5l320-320q12-12 26.5-18t29.5-6q15 0 29.5 6t26.5 18l320 320q12 12 18 26.5t6 29.5q0 15-6 29.5T856-424L536-104q-12 12-26.5 18T480-80ZM320-320l160 160 320-320-320-320-320 320 160 160Zm160-160Z"/>` +
+      `</svg>` +
+      `<span>${loc.popupLabel}</span>` +
+      `</a>`
   );
   map.setView(loc.coords, map.getZoom());
   marker.openPopup();
