@@ -25,6 +25,7 @@ soul-healing/
 │   │   ├── make-about-2.py     # -> public/static/images/about-2.svg
 │   │   └── make-og-image.py    # -> public/static/images/og-preview.jpg
 ├── next.config.mjs         # Static export, served from the domain root (no basePath)
+├── archive/                # Pages kept out of the build (e.g. Reiki & Soul Healing), see its README
 └── .github/workflows/deploy.yml  # Builds and deploys to GitHub Pages
 ```
 
@@ -109,15 +110,23 @@ domain to serve, and is republished on every deploy.
 The client opens `/admin/index.html` on the deployed site, logs in via Tina
 Cloud, edits inline, and saves — Tina commits to `main`, which redeploys
 automatically. Every section is its own Tina document (collection), so each can
-be edited independently — **Home · Hero**, **About**, **Services** (repeatable
-cards), **Reiki** (intro + repeatable content sections), **Soul Healing** (intro
-+ body paragraphs), **Contact** (details, pricing, booking notes) and
-**Booking** (intro + Calendly URL). The fields live in `tina/config.ts` and the
-content in `content/<section>/index.json` (e.g. `content/reiki/index.json`).
+be edited independently — **Home · Hero**, **About** (intro, highlights, text & photo rows), **Services** (repeatable
+cards with a duration), **My Approach** (intro + alternating Counselling / Energy
+Healing sections, each with a photo slot), **FAQ** (repeatable question/answer
+pairs, shown as an accordion on its own page), **Contact** (details, pricing,
+booking notes) and **Booking** (intro + Calendly URL). The fields live in
+`tina/config.ts` and the content in `content/<section>/index.json` (e.g.
+`content/my-approach/index.json`).
 
-> Body copy in Reiki and Soul Healing supports lightweight inline formatting:
-> `*italic*`, `**bold**`, and `[label](https://…)` links. Use
-> `[label](contact)` to link to the Contact section.
+> Photo slots (About rows, My Approach sections) show a dashed placeholder until
+> an image is picked in Tina (or an `image` path such as
+> `/static/images/desert.jpg` is added to the section's JSON). The caption of the
+> placeholder is the photo description, which also becomes the alt text.
+
+> Body copy supports lightweight inline formatting: `*italic*`, `**bold**`, and
+> `[label](https://…)` links. Use `[label](contact)` to link to the Contact
+> section. FAQ answers also take blank lines between paragraphs and `- ` bullet
+> lists.
 
 > The interactive map pins (in `public/js/map.js`) and their coordinates remain
 > in code, not Tina.

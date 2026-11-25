@@ -1,18 +1,25 @@
 {
   "eyebrow": "What I offer",
   "title": "Services",
-  "lead": "I offer different energy healing methods to facilitate a personalised process according to your needs and preferences. Feel free to reach out with any questions, I am here to support you on your healing journey.",
+  "lead": "Healing is a process in which deeper layers are resolved with each treatment, so I recommend at least four sessions. That said, even a single treatment can bring profound relief and one-off sessions are welcome.",
   "cards": [
     {
-      "icon": "✹",
-      "title": "Reiki",
-      "text": "Works with the body’s energy systems to enhance its natural healing abilities. By assisting your body to replenish its energy stores, Reiki supports your nervous system for a greater sense of relief and restoration."
+      "icon": "☾",
+      "title": "Introductory Call",
+      "duration": "20 minutes",
+      "text": "A short call to explore what you’re looking for and whether my approach is a good fit before we begin working together. Schedule via [WhatsApp](whatsapp) or [Email](email)."
+    },
+    {
+      "icon": "〇",
+      "title": "Healing Treatment",
+      "duration": "60 minutes",
+      "text": "Healing sessions to resolve imbalances in your energy system, addressing areas of discomfort in your life to facilitate your healing process and bring you back in touch with your Soul. Comprises Energy Healing and/or Reiki depending on your needs and preferences."
     },
     {
       "icon": "☽",
-      "title": "Soul Healing",
-      "text": "Works with the energies of the whole person—the physical and energetic bodies, emotions, thoughts, personality and Soul. Guides your Soul’s energy to move through areas of dis-ease or imbalance to bring you back to a state of “wholeness”."
+      "title": "Healing and Counselling",
+      "duration": "90 minutes",
+      "text": "Longer sessions comprising an Energy Healing treatment and counselling. By exploring what is present for you (thoughts, emotions, patterns, needs, values), you gain insight to better understand yourself and your unique healing process."
     }
   ]
 }
-
