@@ -2,13 +2,29 @@
   "eyebrow": "About me",
   "title": "Welcome. I'm Yonina,",
   "paragraphs": [
-    "*A weaver of ways, integrating various practices and paths of wisdom to facilitate Healing—for people, the Earth and all beings.*\n\nDrawing upon my academic background in Clinical Psychology (MSc) and energy healing practices, my therapeutic work is rooted in the belief that healing is an embodied process integrating the emotional, mental and physical self. My intention is to offer a nurturing, trauma- informed space that allows you to meet yourself with compassion and acceptance of your emotional and somatic experiences.\n\nHaving lived in four countries with multinational grandparents, my personal journey is one of finding home within myself whilst building and nurturing strong and meaningful connections to the people, communities and land around me.\n\n*Healing is coming back home to yourself, getting in touch with and acting from a place of your authentic Being.*"
+    "*A weaver of ways, integrating various practices and paths of wisdom to facilitate Healing for people, the Earth and all beings.*\n\nThe Earth is my greatest teacher, holding space for us to connect to all creatures, life, and ourselves. From my own journey and the deep communion I’ve experienced with others, I believe that while we may not always see the clear steps on the path ahead, when we trust deeply in ourselves, in others, in the universe and take the courage to take a step, any step, we walk in alignment with our process that supports further development."
   ],
   "highlights": [
     "MSc Clinical Psychology | Leiden University (2025)",
     "Reiki Jin Kei Do | first degree certification (2023)",
     "Esoteric Soul Healing | *currently training* "
   ],
+  "sections": [
+    {
+      "paragraphs": [
+        "The natural environments in which I feel most at home represent the complementary polarities of my heritage and upbringing, nourishing different aspects of myself.",
+        "Misty moorland and mossy forests nurture my connection to the vibrant unseen worlds of spirit – a place where I can deeply rest my bones and soul, held by the acceptance of the earth."
+      ],
+      "imageAlt": "Photo placeholder: old growth forest"
+    },
+    {
+      "paragraphs": [
+        "Vast, dry and silent deserts offer a glimpse of the timelessness of the universe and our own lives, and the ever steady yet ever changing nature of the earth – a place to come with my questions without an expectation for an answer.",
+        "Having lived in five countries with multinational grandparents, my personal journey is one of finding home within myself whilst building and nurturing strong and meaningful connections to the people, communities and land around me.",
+        "*Healing is coming back home to yourself, getting in touch with and acting from a place of your authentic Being.*"
+      ],
+      "imageAlt": "Photo placeholder: desert"
+    }
+  ],
   "cta": "Contact me"
 }
-

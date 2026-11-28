@@ -1,6 +1,6 @@
 import Head from "next/head";
 import Script from "next/script";
-import { Fragment, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTina, tinaField } from "tinacms/dist/react";
 import { makeStaticProps } from "../lib/content";
 
@@ -100,13 +100,39 @@ const renderInline = (text, ctx = {}) => {
 // WhatsApp deep-link needs digits only (no leading "+").
 const waNumber = (phone) => dialNumber(phone).replace(/\D/g, "");
 
-// The single-page site is organised as tabs; only one panel is visible at a time.
-// Services and Contact both live at the bottom of the Home panel;
-// "reiki"/"soul-healing" are their own tabs.
-const TABS = ["home", "about", "reiki", "soul-healing"];
+// Multi-paragraph body copy (FAQ answers). Blank lines separate paragraphs; a
+// block whose every line starts with "- " becomes a bullet list. Each paragraph
+// / bullet goes through renderInline, so links and emphasis work as elsewhere.
+const renderBlocks = (text, ctx) =>
+  (text || "").split(/\n{2,}/).map((block, i) => {
+    const lines = block.split("\n").filter(Boolean);
+    if (lines.length > 0 && lines.every((l) => l.startsWith("- "))) {
+      return (
+        <ul key={i}>
+          {lines.map((l, j) => (
+            <li key={j}>{renderInline(l.slice(2), ctx)}</li>
+          ))}
+        </ul>
+      );
+    }
+    return <p key={i}>{renderInline(block, ctx)}</p>;
+  });
 
-// Maps each service card (by order) to the tab it opens when clicked.
-const SERVICE_TABS = ["reiki", "soul-healing"];
+// A photo slot. Shows a labelled placeholder until an image is chosen in Tina
+// (or its `image` path is filled in the content JSON).
+const Photo = ({ src, alt, className = "", tina }) =>
+  src ? (
+    <img src={`${PREFIX}${src}`} alt={alt || ""} className={`photo ${className}`} loading="lazy" data-tina-field={tina} />
+  ) : (
+    <div className={`photo photo--placeholder ${className}`} role="img" aria-label={alt || "Photo placeholder"} data-tina-field={tina}>
+      <span>{alt || "Photo placeholder"}</span>
+    </div>
+  );
+
+// The single-page site is organised as tabs; only one panel is visible at a time.
+// Services and Contact live at the bottom of the Home panel;
+// "about", "my-approach" and "faq" are their own tabs.
+const TABS = ["home", "about", "my-approach", "faq"];
 
 // In-page sections at the bottom of Home (reached by switching to Home + scroll).
 const HOME_SECTIONS = ["services", "contact"];
@@ -152,35 +178,42 @@ const showLocation = (map, marker, loc) => {
   marker.openPopup();
 };
 
-// Per-page SEO. Each real page (home/about/reiki/soul-healing) is served as its
+// Per-page SEO. Each real page (home/about/my-approach/faq) is served as its
 // own static document with a unique title, description and a *self-referencing*
 // canonical, so Google indexes them independently instead of treating them as
 // alternates of the homepage. Open Graph stays identical across pages by design.
 const SITE = "https://soul-pathways.com";
+// Target search terms: "reiki", "therapy" and "counselling" (plus the US
+// spelling "counseling"). They lead every title/description and the JSON-LD.
+const SEO_KEYWORDS =
+  "reiki, therapy, counselling, counseling, reiki Leiden, therapy Leiden, counselling Leiden, reiki Amsterdam, energy healing, holistic therapy, therapist Leiden";
+const SITE_TITLE = "Soul Pathways – Reiki, Therapy & Counselling in Leiden";
+const SITE_DESCRIPTION =
+  "Reiki, holistic therapy and counselling (counseling) in Leiden and Amsterdam. Reconnect with a deeper sense of balance, presence and wellbeing in your life.";
 const PAGE_SEO = {
   home: {
-    title: "Soul Pathways - Reiki & Soul Healing in Leiden",
+    title: SITE_TITLE,
     description:
-      "Reiki and energy healing in Leiden and Amsterdam. Get back in touch with your Self – Reconnect with a deeper sense of balance, presence and wellbeing in your life.",
+      "Reiki, energy healing therapy and counselling in Leiden and Amsterdam with Soul Pathways. Get back in touch with your Self – reconnect with a deeper sense of balance, presence and wellbeing.",
     canonical: `${SITE}/`,
   },
   about: {
-    title: "About Yonina | Soul Pathways",
+    title: "About Yonina – Reiki Practitioner & Counsellor | Soul Pathways",
     description:
-      "Meet Yonina of Soul Pathways — an MSc Clinical Psychologist and energy healing practitioner offering nurturing, trauma-informed Reiki and Soul Healing in Leiden and Amsterdam.",
+      "Meet Yonina of Soul Pathways — MSc Clinical Psychology, offering nurturing, trauma-informed Reiki, holistic therapy and counselling in Leiden and Amsterdam.",
     canonical: `${SITE}/about/`,
   },
-  reiki: {
-    title: "Reiki Healing in Leiden & Amsterdam | Soul Pathways",
+  "my-approach": {
+    title: "Counselling, Therapy & Reiki – My Approach | Soul Pathways",
     description:
-      "Reiki energy healing with Soul Pathways in Leiden and Amsterdam. Gentle, trauma-informed sessions that support your body's natural capacity to heal and restore balance.",
-    canonical: `${SITE}/reiki/`,
+      "Integrative, trauma-informed counselling (counseling) and energy healing therapy, including Reiki Jin Kei Do, in Leiden and Amsterdam — attuned to your unique needs.",
+    canonical: `${SITE}/my-approach/`,
   },
-  "soul-healing": {
-    title: "Soul Healing in Leiden & Amsterdam | Soul Pathways",
+  faq: {
+    title: "Reiki, Therapy & Counselling FAQ | Soul Pathways",
     description:
-      "Esoteric Soul Healing with Soul Pathways in Leiden and Amsterdam. Energy healing that works with the whole person to restore a deeper sense of wholeness and balance.",
-    canonical: `${SITE}/soul-healing/`,
+      "Questions about Reiki, energy healing therapy and counselling in Leiden and Amsterdam: what a session is like, pricing, how often, cancellations and reimbursement.",
+    canonical: `${SITE}/faq/`,
   },
 };
 
@@ -197,23 +230,23 @@ export default function Home(props) {
   // (.hero__title / .section__title), so the tag swap is visually invisible.
   const HeroTitleTag = page === "home" ? "h1" : "h2";
   const AboutTitleTag = page === "about" ? "h1" : "h2";
-  const ReikiTitleTag = page === "reiki" ? "h1" : "h2";
-  const SoulTitleTag = page === "soul-healing" ? "h1" : "h2";
+  const ApproachTitleTag = page === "my-approach" ? "h1" : "h2";
+  const FaqTitleTag = page === "faq" ? "h1" : "h2";
 
   // Each section is its own Tina document; useTina makes each one live-editable
   // inside the Tina admin iframe. One hook per section keeps them independent.
   const { data: heroData } = useTina(props.hero);
   const { data: aboutData } = useTina(props.about);
   const { data: servicesData } = useTina(props.services);
-  const { data: reikiData } = useTina(props.reiki);
-  const { data: soulHealingData } = useTina(props.soulHealing);
+  const { data: myApproachData } = useTina(props.myApproach);
+  const { data: faqData } = useTina(props.faq);
   const { data: contactData } = useTina(props.contact);
 
   const hero = heroData.hero;
   const about = aboutData.about;
   const services = servicesData.services;
-  const reiki = reikiData.reiki;
-  const soulHealing = soulHealingData.soulHealing;
+  const myApproach = myApproachData.myApproach;
+  const faq = faqData.faq;
   const contact = contactData.contact;
 
   // ── Tab navigation ────────────────────────────────────────────────
@@ -221,6 +254,9 @@ export default function Home(props) {
   // already shows the right content (good for SEO and first paint); on the
   // client we re-sync to the URL path after hydration.
   const [activeTab, setActiveTab] = useState(initialTab);
+
+  // Index of the FAQ question that is open (-1 = all closed). Only one at a time.
+  const [openFaq, setOpenFaq] = useState(-1);
 
   // ── "Copied to clipboard" toast ───────────────────────────────────
   // `label` is the message text (e.g. "Email address"); `visible` drives the
@@ -311,6 +347,13 @@ export default function Home(props) {
         >
           {label}
         </button>
+      );
+    }
+    if (target === "faq") {
+      return (
+        <a key={key} href={pathFor("faq")} onClick={(e) => { e.preventDefault(); selectTab("faq"); }}>
+          {label}
+        </a>
       );
     }
     if (target === "integration-room") {
@@ -522,7 +565,9 @@ export default function Home(props) {
       "@id": `${SITE_URL}#business`,
       name: "Soul Pathways",
       description:
-          "Soul Pathways offers Reiki and holistic therapy in Leiden and Amsterdam.",
+          "Soul Pathways offers Reiki, holistic therapy and counselling (counseling) in Leiden and Amsterdam.",
+      keywords: SEO_KEYWORDS,
+      knowsAbout: ["Reiki", "Reiki Jin Kei Do", "Energy healing", "Holistic therapy", "Counselling", "Counseling", "Clinical psychology"],
       url: SITE_URL,
       logo: `${SITE_URL}static/logo/soul-pathways-logo.svg`,
       image: `${SITE_URL}static/images/og-preview.jpg`,
@@ -544,15 +589,17 @@ export default function Home(props) {
       },
       hasOfferCatalog: {
         "@type": "OfferCatalog",
-        name: "Soul Pathways Therapy",
+        name: "Reiki, Therapy & Counselling",
         itemListElement: [
           {
             "@type": "Offer",
             itemOffered: {
               "@type": "Service",
-              "@id": `${SITE_URL}reiki/#service`,
+              "@id": `${SITE_URL}#reiki`,
               name: "Reiki",
-              url: `${SITE_URL}reiki/`,
+              serviceType: "Reiki",
+              description: "Reiki and energy healing treatments (Reiki Jin Kei Do) to rest, replenish and restore your body's inherent alignment.",
+              url: `${SITE_URL}my-approach/`,
               provider: {
                 "@id": `${SITE_URL}#business`,
               },
@@ -563,9 +610,26 @@ export default function Home(props) {
             "@type": "Offer",
             itemOffered: {
               "@type": "Service",
-              "@id": `${SITE_URL}services/#therapy`,
-              name: "Therapy",
-              url: `${SITE_URL}services/`,
+              "@id": `${SITE_URL}my-approach/#energy-healing`,
+              name: "Energy Healing Therapy",
+              serviceType: "Holistic therapy",
+              alternateName: ["Energy healing", "Holistic therapy", "Healing treatment"],
+              url: `${SITE_URL}my-approach/`,
+              provider: {
+                "@id": `${SITE_URL}#business`,
+              },
+              areaServed: serviceArea,
+            },
+          },
+          {
+            "@type": "Offer",
+            itemOffered: {
+              "@type": "Service",
+              "@id": `${SITE_URL}my-approach/#counselling`,
+              name: "Counselling",
+              serviceType: "Counselling",
+              alternateName: ["Counseling", "Healing and counselling", "Talk therapy"],
+              url: `${SITE_URL}my-approach/`,
               provider: {
                 "@id": `${SITE_URL}#business`,
               },
@@ -581,6 +645,7 @@ export default function Home(props) {
       "@type": "WebSite",
       "@id": `${SITE_URL}#website`,
       name: "Soul Pathways",
+      alternateName: SITE_TITLE,
       url: SITE_URL,
       publisher: {
         "@id": `${SITE_URL}#business`,
@@ -598,6 +663,7 @@ export default function Home(props) {
           content={seo.description}
         />
         <title>{seo.title}</title>
+        <meta name="keywords" content={SEO_KEYWORDS} />
 
         {/* Structured data (JSON-LD) for search engines */}
         <script
@@ -610,11 +676,11 @@ export default function Home(props) {
         <meta property="og:site_name" content="Soul Pathways" />
         <meta
           property="og:title"
-          content="Soul Pathways - Reiki & Soul Healing in Leiden"
+          content={SITE_TITLE}
         />
         <meta
           property="og:description"
-          content="Reconnect with a deeper sense of balance, presence and wellbeing in your life."
+          content={SITE_DESCRIPTION}
         />
         <meta
           property="og:image"
@@ -629,7 +695,7 @@ export default function Home(props) {
         <meta property="og:image:height" content="630" />
         <meta
           property="og:image:alt"
-          content="Soul Pathways - Reiki & Soul Healing in Leiden"
+          content={SITE_TITLE}
         />
         <meta property="og:url" content="https://soul-pathways.com/" />
         <meta name="twitter:card" content="summary_large_image" />
@@ -683,31 +749,13 @@ export default function Home(props) {
           <ul className="nav__menu" id="navMenu" role="tablist" aria-label="Site sections">
             <li><a {...linkProps("home")} className={`nav__link${activeTab === "home" ? " is-active" : ""}`}>Home</a></li>
 
-            {/* Services — hover dropdown on desktop */}
-            <li className="nav__item nav__has-dropdown">
-              <a
-                href={pathFor("services")}
-                className={`nav__link nav__dropdown-toggle${activeTab === "reiki" || activeTab === "soul-healing" ? " is-active" : ""}`}
-                aria-haspopup="true"
-                onClick={(e) => { e.preventDefault(); selectTab("home", "services"); }}
-              >
-                Services <span className="nav__caret" aria-hidden="true">▾</span>
-              </a>
-              <ul className="nav__dropdown">
-                <li><a {...linkProps("reiki")} className={`nav__dropdown-link${activeTab === "reiki" ? " is-active" : ""}`}>Reiki</a></li>
-                <li><a {...linkProps("soul-healing")} className={`nav__dropdown-link${activeTab === "soul-healing" ? " is-active" : ""}`}>Soul Healing</a></li>
-              </ul>
-            </li>
+            <li><a href={pathFor("services")} className="nav__link" onClick={(e) => { e.preventDefault(); selectTab("home", "services"); }}>Services</a></li>
 
-            {/* Direct links — shown only on mobile, where hover menus don't work */}
-            <li className="nav__item--mobile">
-              <a href={pathFor("reiki")} className={`nav__link${activeTab === "reiki" ? " is-active" : ""}`} onClick={(e) => { e.preventDefault(); selectTab("reiki"); }}>Reiki</a>
-            </li>
-            <li className="nav__item--mobile">
-              <a href={pathFor("soul-healing")} className={`nav__link${activeTab === "soul-healing" ? " is-active" : ""}`} onClick={(e) => { e.preventDefault(); selectTab("soul-healing"); }}>Soul Healing</a>
-            </li>
+            <li><a {...linkProps("my-approach")} className={`nav__link${activeTab === "my-approach" ? " is-active" : ""}`}>My Approach</a></li>
 
-            <li><a {...linkProps("about")} className={`nav__link${activeTab === "about" ? " is-active" : ""}`}>About</a></li>
+            <li><a {...linkProps("about")} className={`nav__link${activeTab === "about" ? " is-active" : ""}`}>About Me</a></li>
+
+            <li><a {...linkProps("faq")} className={`nav__link${activeTab === "faq" ? " is-active" : ""}`}>FAQ</a></li>
 
             <li><a href={pathFor("contact")} className="nav__link nav__link--cta" onClick={(e) => { e.preventDefault(); selectTab("home", "contact"); }}>Contact</a></li>
           </ul>
@@ -756,35 +804,76 @@ export default function Home(props) {
               </div>
 
               <div className="services__grid">
-                {services.cards?.map((card, i) => {
-                  const tab = SERVICE_TABS[i];
-                  return (
-                    <a
-                      className="card card--link"
-                      key={i}
-                      href={tab ? pathFor(tab) : undefined}
-                      onClick={tab ? (e) => { e.preventDefault(); selectTab(tab); } : undefined}
-                      data-tina-field={tinaField(card)}
-                    >
-                      <div className="card__icon" aria-hidden="true" data-tina-field={tinaField(card, "icon")}>{card.icon}</div>
-                      <h3 className="card__title" data-tina-field={tinaField(card, "title")}>{card.title}</h3>
-                      <p className="card__text" data-tina-field={tinaField(card, "text")}>
-                        {card.text}
-                      </p>
-                      <span className="card__more" aria-hidden="true">Learn more →</span>
-                    </a>
-                  );
-                })}
+                {services.cards?.map((card, i) => (
+                  <div className="card" key={i} data-tina-field={tinaField(card)}>
+                    <h3 className="card__title" data-tina-field={tinaField(card, "title")}>{card.title}</h3>
+                    {card.duration && (
+                      <p className="card__duration" data-tina-field={tinaField(card, "duration")}>{card.duration}</p>
+                    )}
+                    <p className="card__text" data-tina-field={tinaField(card, "text")}>
+                      {renderInline(card.text, { selectTab, resolveLink: resolveBookingLink })}
+                    </p>
+                    <div className="card__icon" aria-hidden="true" data-tina-field={tinaField(card, "icon")}>{card.icon}</div>
+                  </div>
+                ))}
               </div>
             </div>
           </section>
         </div>
 
+        {/* ===================== FAQ (Tina-editable) ===================== */}
+        <section {...panelProps("faq", "section faq")}>
+          <div className="container">
+            <div className="section__head">
+              {faq.eyebrow && (
+                <p className="section__eyebrow" data-tina-field={tinaField(faq, "eyebrow")}>{faq.eyebrow}</p>
+              )}
+              <FaqTitleTag className="section__title" data-tina-field={tinaField(faq, "title")}>{faq.title}</FaqTitleTag>
+            </div>
+
+            {/* Accordion: opening a question closes whichever one was open. */}
+            <div className="faq__list">
+              {faq.items?.map((item, i) => {
+                const isOpen = openFaq === i;
+                return (
+                  <div className={`faq__item${isOpen ? " is-open" : ""}`} key={i} data-tina-field={tinaField(item)}>
+                    <h3 className="faq__heading">
+                      <button
+                        type="button"
+                        className="faq__question"
+                        id={`faq-q-${i}`}
+                        aria-expanded={isOpen}
+                        aria-controls={`faq-a-${i}`}
+                        onClick={() => setOpenFaq(isOpen ? -1 : i)}
+                      >
+                        <span data-tina-field={tinaField(item, "question")}>{item.question}</span>
+                        <span className="faq__icon" aria-hidden="true"></span>
+                      </button>
+                    </h3>
+                    <div
+                      className="faq__answer"
+                      id={`faq-a-${i}`}
+                      role="region"
+                      aria-labelledby={`faq-q-${i}`}
+                      hidden={!isOpen}
+                      data-tina-field={tinaField(item, "answer")}
+                    >
+                      {renderBlocks(item.answer, { selectTab })}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
         {/* ===================== ABOUT (Tina-editable) ===================== */}
+        {/* Intro row (portrait + text), then rows that pair text with a photo,
+            alternating sides like My Approach. */}
         <section {...panelProps("about", "section about")}>
           <div className="container about__grid">
             <div className="about__media">
-              <img src={`${PREFIX}/static/images/about-1.jpg`} alt="Portrait of the practitioner — placeholder" className="about__photo about__photo--main" />
+              <img src={`${PREFIX}/static/images/about-1.jpg`} alt="Yonina, Reiki practitioner and counsellor at Soul Pathways" className="about__photo about__photo--main" />
               {/* Wide screens: highlights sit under the photo. Hidden on mobile (see CSS). */}
               <ul className="about__highlights about__highlights--onMedia" data-tina-field={tinaField(about, "highlights")}>
                 {about.highlights?.map((item, i) => (
@@ -813,84 +902,67 @@ export default function Home(props) {
                   <li key={i}>{withEmphasis(item)}</li>
                 ))}
               </ul>
-
-              <a href={pathFor("contact")} className="btn btn--primary" data-tab="contact" onClick={(e) => { e.preventDefault(); selectTab("home", "contact"); }} data-tina-field={tinaField(about, "cta")}>
-                {about.cta}
-              </a>
             </div>
+          </div>
+
+          {about.sections?.map((row, i) => (
+            <div className={`container about__row${i % 2 === 1 ? " about__row--reverse" : ""}`} key={i} data-tina-field={tinaField(row)}>
+              <div className="about__text" data-tina-field={tinaField(row, "paragraphs")}>
+                {row.paragraphs?.map((para, j) => (
+                  <p key={j}>{withEmphasis(para)}</p>
+                ))}
+              </div>
+              <Photo src={row.image} alt={row.imageAlt} className="about__row-photo" tina={tinaField(row, "image")} />
+            </div>
+          ))}
+
+          <div className="container about__cta">
+            <a href={pathFor("contact")} className="btn btn--primary" data-tab="contact" onClick={(e) => { e.preventDefault(); selectTab("home", "contact"); }} data-tina-field={tinaField(about, "cta")}>
+              {about.cta}
+            </a>
           </div>
         </section>
 
-        {/* ===================== REIKI (Tina-editable) ===================== */}
-        <section {...panelProps("reiki", "section service-page")}>
-          <div className="container">
-            <div className="section__head">
-              {reiki.eyebrow && (
-                <p className="section__eyebrow" data-tina-field={tinaField(reiki, "eyebrow")}>{reiki.eyebrow}</p>
-              )}
-              <ReikiTitleTag className="section__title" data-tina-field={tinaField(reiki, "title")}>{reiki.title}</ReikiTitleTag>
-              <p className="section__lead" data-tina-field={tinaField(reiki, "lead")}>
-                {reiki.lead}
-              </p>
-            </div>
-
-            <div className="service-page__body">
-              {reiki.sections?.map((s, i) => (
-                <Fragment key={i}>
-                  <h3 data-tina-field={tinaField(s, "heading")}>{s.heading}</h3>
-                  {s.gloss && (
-                    <p className="service-page__gloss" data-tina-field={tinaField(s, "gloss")}>
-                      {renderInline(s.gloss, { selectTab })}
-                    </p>
-                  )}
-                  <p data-tina-field={tinaField(s, "body")}>{renderInline(s.body, { selectTab })}</p>
-                </Fragment>
-              ))}
-              <a href={pathFor("contact")} className="btn btn--primary" onClick={(e) => { e.preventDefault(); selectTab("home", "contact"); }} data-tina-field={tinaField(reiki, "cta")}>
-                {reiki.cta}
-              </a>
-            </div>
-          </div>
-        </section>
-
-        {/* ===================== SOUL HEALING (Tina-editable) ===================== */}
-        <section {...panelProps("soul-healing", "section service-page")}>
-          <div className="container">
-            <div className="section__head">
-              {soulHealing.eyebrow && (
-                <p className="section__eyebrow" data-tina-field={tinaField(soulHealing, "eyebrow")}>{soulHealing.eyebrow}</p>
-              )}
-              <SoulTitleTag className="section__title" data-tina-field={tinaField(soulHealing, "title")}>{soulHealing.title}</SoulTitleTag>
-              {soulHealing.lead && (
-                <p className="section__lead" data-tina-field={tinaField(soulHealing, "lead")}>
-                  {soulHealing.lead}
+        {/* ===================== MY APPROACH (Tina-editable) ===================== */}
+        <div {...panelProps("my-approach", "approach")}>
+          <section className="section approach__intro">
+            <div className="container">
+              <div className="section__head">
+                {myApproach.eyebrow && (
+                  <p className="section__eyebrow" data-tina-field={tinaField(myApproach, "eyebrow")}>{myApproach.eyebrow}</p>
+                )}
+                <ApproachTitleTag className="section__title" data-tina-field={tinaField(myApproach, "title")}>{myApproach.title}</ApproachTitleTag>
+                <p className="section__lead" data-tina-field={tinaField(myApproach, "lead")}>
+                  {myApproach.lead}
                 </p>
-              )}
+              </div>
             </div>
+          </section>
 
-            <div className="service-page__body">
-              {soulHealing.intro?.map((para, i) => (
-                <p key={`intro-${i}`} data-tina-field={tinaField(soulHealing, "intro")}>
-                  <em>{renderInline(para, { selectTab })}</em>
-                </p>
-              ))}
-              {soulHealing.sections?.map((s, i) => (
-                <Fragment key={i}>
-                  <h3 data-tina-field={tinaField(s, "heading")}>{s.heading}</h3>
-                  {s.gloss && (
-                    <p className="service-page__gloss" data-tina-field={tinaField(s, "gloss")}>
-                      {renderInline(s.gloss, { selectTab })}
-                    </p>
-                  )}
-                  <p data-tina-field={tinaField(s, "body")}>{renderInline(s.body, { selectTab })}</p>
-                </Fragment>
-              ))}
-              <a href={pathFor("contact")} className="btn btn--primary" onClick={(e) => { e.preventDefault(); selectTab("home", "contact"); }} data-tina-field={tinaField(soulHealing, "cta")}>
-                {soulHealing.cta}
+          {myApproach.blocks?.map((block, i) => (
+            <section className={`section approach__block approach__block--${i % 2 === 0 ? "a" : "b"}`} key={i} data-tina-field={tinaField(block)}>
+              <div className="container approach__grid">
+                <div className="approach__text">
+                  <h2 className="approach__heading" data-tina-field={tinaField(block, "heading")}>{block.heading}</h2>
+                  <div data-tina-field={tinaField(block, "paragraphs")}>
+                    {block.paragraphs?.map((para, j) => (
+                      <p key={j}>{renderInline(para, { selectTab })}</p>
+                    ))}
+                  </div>
+                </div>
+                <Photo src={block.image} alt={block.imageAlt} className="approach__photo" tina={tinaField(block, "image")} />
+              </div>
+            </section>
+          ))}
+
+          <section className="section approach__cta">
+            <div className="container">
+              <a href={pathFor("contact")} className="btn btn--primary" onClick={(e) => { e.preventDefault(); selectTab("home", "contact"); }} data-tina-field={tinaField(myApproach, "cta")}>
+                {myApproach.cta}
               </a>
             </div>
-          </div>
-        </section>
+          </section>
+        </div>
 
         {/* ===================== CONTACT — shown at the bottom of the Home page ===================== */}
         <section id="contact" className="section contact" hidden={activeTab !== "home"}>
@@ -956,12 +1028,12 @@ export default function Home(props) {
 
               <div className="contact__pricing">
                 <h3 className="contact__subtitle" data-tina-field={tinaField(contact, "pricingTitle")}>{contact.pricingTitle}</h3>
-                <p className="contact__price" data-tina-field={tinaField(contact, "pricingSingle")}>
-                  {contact.pricingSingle}
-                </p>
+                <ul className="contact__prices" data-tina-field={tinaField(contact, "pricingItems")}>
+                  {contact.pricingItems?.map((line, i) => (
+                    <li key={i}>{line}</li>
+                  ))}
+                </ul>
                 <p className="contact__price">
-                  <span data-tina-field={tinaField(contact, "pricingReduced")}>{contact.pricingReduced}</span>
-                  <br />
                   <em data-tina-field={tinaField(contact, "pricingReducedNote")}>{contact.pricingReducedNote}</em>
                 </p>
               </div>
@@ -975,6 +1047,11 @@ export default function Home(props) {
                   {renderInline(contact.bookingAmsterdam, { selectTab, resolveLink: resolveBookingLink })}
                 </p>
                 <p data-tina-field={tinaField(contact, "bookingHomeNote")}><em>{contact.bookingHomeNote}</em></p>
+                {contact.faqNote && (
+                  <p className="contact__faq" data-tina-field={tinaField(contact, "faqNote")}>
+                    {renderInline(contact.faqNote, { selectTab, resolveLink: resolveBookingLink })}
+                  </p>
+                )}
               </div>
             </div>
 

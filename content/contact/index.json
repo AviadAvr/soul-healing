@@ -1,18 +1,21 @@
 {
   "eyebrow": "Get in touch",
   "title": "Contact & Booking",
-  "lead": "I primarily offer treatments from my home in the centre of Leiden, where my practice is based. Additionally, I have some availability at a clinic in Amsterdam.",
+  "lead": "I primarily offer treatments from my clinic in the centre of Leiden, where my practice is based. Additionally, I have some availability at a clinic in Amsterdam.",
   "detailsTitle": "Reach out",
   "email": "yonina@soul-pathways.com",
   "phone": "(+31) 06 4497 4792",
   "pricingTitle": "Pricing",
-  "pricingSingle": "Single treatment: €50",
-  "pricingReduced": "Reduced rate: €35",
-  "pricingReducedNote": "For students and those experiencing financial constraints. Please choose the rate that best reflects your current circumstances.",
+  "pricingItems": [
+    "Introductory Call | 20 mins | Free",
+    "Healing Treatment | 60 mins | €50 per session (€40 reduced rate*)",
+    "Healing and Counselling | 90 mins | €75 per session (€60 reduced rate*)"
+  ],
+  "pricingReducedNote": "* For students and those experiencing financial constraints. Please choose the rate that best reflects your current circumstances.",
   "bookingTitle": "Booking",
   "integrationRoomUrl": "https://www.theintegrationroom.nl/about-6",
   "bookingLeiden": "For treatments in Leiden, please contact me via [WhatsApp](whatsapp) or [Email](email) for scheduling and availability.",
-  "bookingAmsterdam": "For treatments in Amsterdam, please refer to [The Integration Room](integration-room) clinic's website for their updated pricing and booking.",
-  "bookingHomeNote": "Under certain circumstances, I may be able to offer treatments in your home. Reach out if this improves your access to care."
+  "bookingAmsterdam": "For Reiki treatments in Amsterdam, please refer to [The Integration Room](integration-room) clinic's website for their updated pricing and booking.",
+  "bookingHomeNote": "Under certain circumstances, I may be able to offer treatments in your home. Reach out if this improves your access to care.",
+  "faqNote": "You can find more information about sessions in the [FAQ](faq)."
 }
-

@@ -1,0 +1,42 @@
+/* ----------------------- Service pages (Reiki / Soul Healing) ----------------------- */
+.service-page__body {
+    max-width: 720px;
+    margin: 0 auto;
+}
+
+.service-page__body h3 {
+    font-size: 1.35rem;
+    margin: 1.6em 0 0.4em;
+    color: var(--c-ink);
+}
+
+.service-page__body p {
+    color: var(--c-ink-soft);
+    margin: 0 0 1.1em;
+}
+
+/* Italic gloss that acts as an "in-between" subtitle: sits close under the
+   heading, with a clear gap before the paragraph that follows.
+   Scoped under .service-page__body so it out-specifies `.service-page__body p`. */
+.service-page__body .service-page__gloss {
+    margin: -0.1em 0 0.4em;
+    color: var(--c-ink);
+}
+
+.service-page__body .btn {
+    margin-top: 20px;
+}
+
+/* Inline links inside body copy — made obvious (bold + hover colour shift),
+   matching the WhatsApp/Email links in the booking section. */
+.service-page__body p a {
+    color: var(--c-sage-dark);
+    font-weight: 700;
+    transition: color 0.15s ease;
+}
+
+.service-page__body p a:hover,
+.service-page__body p a:focus-visible {
+    color: var(--c-ink);
+}
+

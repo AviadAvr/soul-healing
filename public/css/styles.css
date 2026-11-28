@@ -191,88 +191,6 @@ h3 {
     color: #fff;
 }
 
-/* Services dropdown (desktop hover menu) */
-.nav__has-dropdown {
-    position: relative;
-}
-
-.nav__dropdown-toggle {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    cursor: pointer;
-}
-
-.nav__dropdown-toggle.is-active {
-    color: var(--c-sage-dark);
-}
-
-.nav__caret {
-    font-size: 0.7em;
-    transition: transform 0.2s ease;
-}
-
-.nav__has-dropdown:hover .nav__caret {
-    transform: rotate(180deg);
-}
-
-.nav__dropdown {
-    position: absolute;
-    top: 100%;
-    left: 100%;
-    transform: translate(-50%, 8px);
-    min-width: 190px;
-    list-style: none;
-    margin: 0;
-    padding: 8px;
-    background: var(--c-white);
-    border: 1px solid var(--c-line);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow-md);
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
-    z-index: 1001;
-}
-
-/* Invisible bridge so the menu stays open while moving the cursor down onto it. */
-.nav__dropdown::before {
-    content: "";
-    position: absolute;
-    top: -12px;
-    left: 0;
-    right: 0;
-    height: 12px;
-}
-
-.nav__has-dropdown:hover .nav__dropdown {
-    opacity: 1;
-    visibility: visible;
-    transform: translate(-50%, 0);
-}
-
-.nav__dropdown-link {
-    display: block;
-    padding: 10px 14px;
-    border-radius: 10px;
-    color: var(--c-ink-soft);
-    font-weight: 600;
-    font-size: 0.95rem;
-    white-space: nowrap;
-    transition: background 0.2s ease, color 0.2s ease;
-}
-
-.nav__dropdown-link:hover,
-.nav__dropdown-link.is-active {
-    background: var(--c-bg-alt);
-    color: var(--c-sage-dark);
-}
-
-/* Direct Reiki / Soul Healing links only appear on mobile. */
-.nav__item--mobile {
-    display: none;
-}
-
 .nav__toggle {
     display: none;
     flex-direction: column;
@@ -526,8 +444,7 @@ h3 {
 
 .services__grid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 360px));
-    justify-content: center;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 28px;
 }
 
@@ -536,25 +453,41 @@ h3 {
     flex-direction: column;
     background: var(--c-white);
     border-radius: var(--radius-lg);
-    padding: 40px 32px;
+    padding: 36px 30px;
     box-shadow: var(--shadow-sm);
     border: 1px solid var(--c-line);
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
-/* Whole card acts as a link to its service page. */
-.card--link {
-    text-decoration: none;
-    color: inherit;
-    cursor: pointer;
+/* Layout per card: title, duration, description, icon pinned to the bottom. */
+.card__title {
+    font-size: 1.6rem;
+    margin-bottom: 0.3em;
+    text-align: center;
 }
 
-.card:hover {
-    transform: translateY(-6px);
-    box-shadow: var(--shadow-md);
+.card__duration {
+    margin: 0 0 1.1em;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--c-sage-dark);
 }
 
-/* Icon + title are centred; body copy stays left-aligned for readability. */
+.card__text {
+    color: var(--c-ink-soft);
+    margin: 0 0 1.6em;
+}
+
+.card__text a,
+.card__text .contact__copy--inline {
+    color: var(--c-sage-dark);
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
 .card__icon {
     width: 58px;
     height: 58px;
@@ -564,35 +497,7 @@ h3 {
     background: var(--c-bg-alt);
     color: var(--c-sage-dark);
     font-size: 1.6rem;
-    margin: 0 auto 22px;
-}
-
-.card__title {
-    font-size: 1.6rem;
-    margin-bottom: 0.4em;
-    text-align: center;
-}
-
-.card__text {
-    color: var(--c-ink-soft);
-    margin: 0;
-}
-
-.card__more {
-    margin-top: 18px;
-    color: var(--c-sage-dark);
-    font-weight: 600;
-    font-size: 0.95rem;
-    align-self: center;
-    opacity: 0;
-    transform: translateY(4px);
-    transition: opacity 0.25s ease, transform 0.25s ease;
-}
-
-.card--link:hover .card__more,
-.card--link:focus-visible .card__more {
-    opacity: 1;
-    transform: translateY(0);
+    margin: auto auto 0;
 }
 
 /* ----------------------- Contact ----------------------- */
@@ -735,6 +640,17 @@ h3 {
 }
 
 /* Pricing lines */
+.contact__prices {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1em;
+    color: var(--c-ink-soft);
+}
+
+.contact__prices li + li {
+    margin-top: 0.3em;
+}
+
 .contact__price {
     color: var(--c-ink-soft);
     margin: 0 0 1em;
@@ -826,48 +742,6 @@ h3 {
     color: var(--c-ink-soft);
 }
 
-/* ----------------------- Service pages (Reiki / Soul Healing) ----------------------- */
-.service-page__body {
-    max-width: 720px;
-    margin: 0 auto;
-}
-
-.service-page__body h3 {
-    font-size: 1.35rem;
-    margin: 1.6em 0 0.4em;
-    color: var(--c-ink);
-}
-
-.service-page__body p {
-    color: var(--c-ink-soft);
-    margin: 0 0 1.1em;
-}
-
-/* Italic gloss that acts as an "in-between" subtitle: sits close under the
-   heading, with a clear gap before the paragraph that follows.
-   Scoped under .service-page__body so it out-specifies `.service-page__body p`. */
-.service-page__body .service-page__gloss {
-    margin: -0.1em 0 0.4em;
-    color: var(--c-ink);
-}
-
-.service-page__body .btn {
-    margin-top: 20px;
-}
-
-/* Inline links inside body copy — made obvious (bold + hover colour shift),
-   matching the WhatsApp/Email links in the booking section. */
-.service-page__body p a {
-    color: var(--c-sage-dark);
-    font-weight: 700;
-    transition: color 0.15s ease;
-}
-
-.service-page__body p a:hover,
-.service-page__body p a:focus-visible {
-    color: var(--c-ink);
-}
-
 /* Map */
 .contact__map-wrap {
     text-align: center;
@@ -940,6 +814,209 @@ h3 {
 }
 
 
+/* ----------------------- Photos (placeholders until real images are added) ----------------------- */
+.photo {
+    width: 100%;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    object-fit: cover;
+}
+
+.photo--placeholder {
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    text-align: center;
+    color: var(--c-ink-soft);
+    font-size: 0.9rem;
+    font-style: italic;
+    background: rgba(255, 255, 255, 0.55);
+    border: 2px dashed var(--c-sage);
+    box-shadow: none;
+}
+
+/* ----------------------- About: text & photo rows ----------------------- */
+.about__row {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: clamp(32px, 6vw, 80px);
+    align-items: center;
+    margin-top: clamp(48px, 7vw, 96px);
+}
+
+/* Every other row mirrors the layout: photo on the left. */
+.about__row--reverse {
+    grid-template-columns: 1fr 1.3fr;
+}
+
+.about__row--reverse .about__text {
+    order: 2;
+}
+
+.about__row-photo {
+    aspect-ratio: 4 / 3;
+}
+
+.about__cta {
+    margin-top: clamp(40px, 6vw, 72px);
+    text-align: center;
+}
+
+/* ----------------------- My Approach ----------------------- */
+.approach__intro {
+    background: var(--c-bg);
+    padding-bottom: 0;
+}
+
+.approach__intro .section__head {
+    max-width: 720px;
+    margin-bottom: clamp(40px, 6vw, 72px);
+}
+
+/* Alternating tinted bands break the page up (counselling / energy healing). */
+.approach__block--a {
+    background: var(--c-bg-alt);
+}
+
+.approach__block--b {
+    background: var(--c-bg);
+}
+
+.approach__grid {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: clamp(32px, 6vw, 80px);
+    align-items: center;
+}
+
+/* Every other block mirrors the layout: photo on the left. */
+.approach__block--b .approach__text {
+    order: 2;
+}
+
+.approach__block--b .approach__grid {
+    grid-template-columns: 1fr 1.3fr;
+}
+
+.approach__heading {
+    font-size: clamp(1.7rem, 3vw, 2.3rem);
+}
+
+.approach__text p {
+    color: var(--c-ink-soft);
+    margin-bottom: 1.1em;
+}
+
+.approach__photo {
+    aspect-ratio: 4 / 5;
+}
+
+.approach__cta {
+    background: var(--c-bg);
+    text-align: center;
+    padding-block: clamp(40px, 6vw, 72px);
+}
+
+/* When the last block shares the page background, drop its bottom padding so
+   the button sits as close to the text as on the About page. */
+.approach__block--b:has(+ .approach__cta) {
+    padding-bottom: 0;
+}
+
+/* ----------------------- FAQ ----------------------- */
+.faq {
+    background: var(--c-bg);
+}
+
+.faq__list {
+    max-width: 760px;
+    margin: 0 auto;
+    border-top: 1px solid var(--c-line);
+}
+
+.faq__item {
+    border-bottom: 1px solid var(--c-line);
+}
+
+.faq__heading {
+    margin: 0;
+    font-size: inherit;
+}
+
+.faq__question {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    width: 100%;
+    padding: 20px 4px;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    text-align: left;
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+    font-weight: 500;
+    line-height: 1.3;
+    color: var(--c-ink);
+    transition: color 0.2s ease;
+}
+
+.faq__question:hover,
+.faq__question:focus-visible {
+    color: var(--c-sage-dark);
+}
+
+/* Plus that turns into a minus when the question is open. */
+.faq__icon {
+    position: relative;
+    flex: 0 0 18px;
+    width: 18px;
+    height: 18px;
+}
+
+.faq__icon::before,
+.faq__icon::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    margin-top: -1px;
+    background: var(--c-sage-dark);
+    transition: transform 0.25s ease;
+}
+
+.faq__icon::after {
+    transform: rotate(90deg);
+}
+
+.faq__item.is-open .faq__icon::after {
+    transform: rotate(0deg);
+}
+
+.faq__answer {
+    padding: 0 4px 22px;
+}
+
+.faq__answer p,
+.faq__answer ul {
+    color: var(--c-ink-soft);
+    margin: 0 0 1em;
+}
+
+.faq__answer ul {
+    padding-left: 1.3em;
+}
+
+.faq__answer li + li {
+    margin-top: 0.4em;
+}
+
+.faq__answer a {
+    font-weight: 700;
+}
 /* ----------------------- Footer ----------------------- */
 .site-footer {
     background: var(--c-ink);
@@ -988,15 +1065,6 @@ h3 {
         display: flex;
     }
 
-    /* Swap the Services hover menu for direct links on touch/small screens. */
-    .nav__has-dropdown {
-        display: none;
-    }
-
-    .nav__item--mobile {
-        display: block;
-    }
-
     .nav__menu {
         position: fixed;
         inset: var(--header-h) 0 auto 0;
@@ -1038,6 +1106,9 @@ h3 {
     }
 
     .about__grid,
+    .about__row,
+    .about__row--reverse,
+    .approach__grid,
     .contact__grid {
         grid-template-columns: 1fr;
     }
@@ -1049,6 +1120,11 @@ h3 {
 
     .about__highlights--inText {
         display: grid;
+        margin-bottom: 0;
+    }
+
+    .about__row {
+        margin-top: 32px;
     }
 
     .contact__grid {
@@ -1058,6 +1134,22 @@ h3 {
             "pricing";
     }
 
+    /* Single column: My Approach shows the photo above the text; About keeps
+       text first, then its photo. */
+    .approach__block--b .approach__text,
+    .about__row--reverse .about__text {
+        order: 0;
+    }
+
+    .approach__block--b .approach__grid {
+        grid-template-columns: 1fr;
+    }
+
+    .approach__photo {
+        order: -1;
+        aspect-ratio: 4 / 3;
+    }
+
     .about__media {
         min-height: 0;
         max-width: 420px;
@@ -1065,6 +1157,9 @@ h3 {
     }
 
 
+}
+
+@media (max-width: 1000px) {
     .services__grid {
         grid-template-columns: 1fr;
         max-width: 460px;

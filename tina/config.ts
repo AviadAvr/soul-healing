@@ -8,7 +8,7 @@ const branch =
   "main";
 
 // Each section of the single-page site is its own Tina document/collection, so
-// every part (Home hero, About, Services, Reiki, Soul Healing, Contact, Booking)
+// every part (Home hero, About, Services, My Approach, FAQ, Contact, Booking)
 // can be edited independently in the CMS. `router` opens the matching tab in the
 // live site so contextual (inline) editing lands on the right panel.
 const sectionUi = (tab: string) => ({
@@ -96,6 +96,31 @@ export default defineConfig({
             label: "Highlights",
             list: true,
           },
+          {
+            type: "object",
+            name: "sections",
+            label: "Text & photo rows (photo side alternates)",
+            list: true,
+            ui: { itemProps: (item) => ({ label: item?.imageAlt }) },
+            fields: [
+              {
+                type: "string",
+                name: "paragraphs",
+                label: "Paragraphs",
+                list: true,
+                ui: { component: "textarea" },
+                description: "Wrap words in *asterisks* for italics.",
+              },
+              { type: "image", name: "image", label: "Photo" },
+              {
+                type: "string",
+                name: "imageAlt",
+                label: "Photo description",
+                description:
+                  "Used as the alt text, and shown as the caption of the placeholder until a photo is chosen.",
+              },
+            ],
+          },
           { type: "string", name: "cta", label: "Button label" },
         ],
       },
@@ -124,23 +149,26 @@ export default defineConfig({
             fields: [
               { type: "string", name: "icon", label: "Icon (symbol)" },
               { type: "string", name: "title", label: "Title" },
+              { type: "string", name: "duration", label: "Duration (e.g. 60 minutes)" },
               {
                 type: "string",
                 name: "text",
                 label: "Description",
                 ui: { component: "textarea" },
+                description:
+                  "Supports [WhatsApp](whatsapp) and [Email](email) links, *italic* and **bold**.",
               },
             ],
           },
         ],
       },
-      // ───────────── REIKI ─────────────
+      // ───────────── MY APPROACH ─────────────
       {
-        name: "reiki",
-        label: "Reiki",
-        path: "content/reiki",
+        name: "myApproach",
+        label: "My Approach",
+        path: "content/my-approach",
         format: "json",
-        ui: sectionUi("reiki"),
+        ui: sectionUi("my-approach"),
         fields: [
           { type: "string", name: "eyebrow", label: "Eyebrow" },
           { type: "string", name: "title", label: "Heading" },
@@ -152,86 +180,64 @@ export default defineConfig({
           },
           {
             type: "object",
-            name: "sections",
-            label: "Content sections",
+            name: "blocks",
+            label: "Approach sections (alternating background colours)",
             list: true,
             ui: { itemProps: (item) => ({ label: item?.heading }) },
             fields: [
               { type: "string", name: "heading", label: "Heading" },
               {
                 type: "string",
-                name: "gloss",
-                label: "Gloss (italic sub-line, optional)",
-                description:
-                  "Wrap words in *asterisks* for italics, **double** for bold.",
-              },
-              {
-                type: "string",
-                name: "body",
-                label: "Body",
+                name: "paragraphs",
+                label: "Paragraphs",
+                list: true,
                 ui: { component: "textarea" },
                 description:
                   "Supports *italic*, **bold** and [links](https://…) or [contact me](contact).",
+              },
+              { type: "image", name: "image", label: "Photo (optional)" },
+              {
+                type: "string",
+                name: "imageAlt",
+                label: "Photo description",
+                description:
+                  "Used as the alt text, and shown as the caption of the placeholder until a photo is chosen.",
               },
             ],
           },
           { type: "string", name: "cta", label: "Button label" },
         ],
       },
-      // ───────────── SOUL HEALING ─────────────
+      // ───────────── FAQ ─────────────
       {
-        name: "soulHealing",
-        label: "Soul Healing",
-        path: "content/soul-healing",
+        name: "faq",
+        label: "FAQ",
+        path: "content/faq",
         format: "json",
-        ui: sectionUi("soul-healing"),
+        ui: sectionUi("faq"),
         fields: [
-          { type: "string", name: "eyebrow", label: "Eyebrow (optional)" },
+          { type: "string", name: "eyebrow", label: "Eyebrow" },
           { type: "string", name: "title", label: "Heading" },
           {
-            type: "string",
-            name: "intro",
-            label: "Intro notes (shown in italic, above the sections)",
-            list: true,
-            ui: { component: "textarea" },
-            description:
-              "Supports *italic*, **bold** and [links](https://…) or [contact me](contact).",
-          },
-          {
-            type: "string",
-            name: "lead",
-            label: "Lead paragraph (optional)",
-            ui: { component: "textarea" },
-          },
-          {
             type: "object",
-            name: "sections",
-            label: "Content sections",
+            name: "items",
+            label: "Questions",
             list: true,
-            ui: { itemProps: (item) => ({ label: item?.heading }) },
+            ui: { itemProps: (item) => ({ label: item?.question }) },
             fields: [
-              { type: "string", name: "heading", label: "Heading" },
+              { type: "string", name: "question", label: "Question" },
               {
                 type: "string",
-                name: "gloss",
-                label: "Gloss (italic sub-line, optional)",
-                description:
-                  "Wrap words in *asterisks* for italics, **double** for bold.",
-              },
-              {
-                type: "string",
-                name: "body",
-                label: "Body",
+                name: "answer",
+                label: "Answer",
                 ui: { component: "textarea" },
                 description:
-                  "Supports *italic*, **bold** and [links](https://…) or [contact me](contact).",
+                  "Separate paragraphs with a blank line. Start every line of a block with “- ” for a bullet list. Supports *italic*, **bold** and [links](https://…) or [reach out](contact).",
               },
             ],
           },
-          { type: "string", name: "cta", label: "Button label" },
         ],
-      },
-      // ───────────── CONTACT ─────────────
+      },      // ───────────── CONTACT ─────────────
       {
         name: "contact",
         label: "Contact",
@@ -251,8 +257,12 @@ export default defineConfig({
           { type: "string", name: "email", label: "Email" },
           { type: "string", name: "phone", label: "Phone" },
           { type: "string", name: "pricingTitle", label: "Pricing heading" },
-          { type: "string", name: "pricingSingle", label: "Single treatment price" },
-          { type: "string", name: "pricingReduced", label: "Reduced rate" },
+          {
+            type: "string",
+            name: "pricingItems",
+            label: "Prices (one line per session type)",
+            list: true,
+          },
           {
             type: "string",
             name: "pricingReducedNote",
@@ -282,6 +292,13 @@ export default defineConfig({
             name: "bookingHomeNote",
             label: "Home-visit note",
             ui: { component: "textarea" },
+          },
+          {
+            type: "string",
+            name: "faqNote",
+            label: "FAQ note",
+            ui: { component: "textarea" },
+            description: "Use [FAQ](faq) to link to the FAQ page.",
           },
         ],
       },
