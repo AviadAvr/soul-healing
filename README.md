@@ -105,6 +105,48 @@ The live site is served from the root of the custom domain
 (`https://soul-pathways.com/`). The `public/CNAME` file tells GitHub Pages which
 domain to serve, and is republished on every deploy.
 
+## Hosting & services overview
+
+A map of the services behind the site, for whoever (probably future me) needs to
+manage it. **No credentials belong in this file or anywhere in this repo.**
+Passwords, API keys and recovery codes live in a password manager.
+
+| Concern | Service | Notes |
+| --- | --- | --- |
+| Domain registration | **Porkbun** | `soul-pathways.com`. DNS records are managed in the Porkbun dashboard. |
+| DNS → site | Porkbun DNS → GitHub Pages | `public/CNAME` tells Pages which custom domain to serve. |
+| Website hosting | **GitHub Pages** | Static export of Next.js, published by `.github/workflows/deploy.yml` on every push to `main`. |
+| Content management | **TinaCMS** (Tina Cloud) | Editor at `/admin/index.html`. Edits are committed to the repo as JSON in `content/`, which triggers a redeploy. |
+| Outgoing email (SMTP routing) | **Resend** | Sends mail for the domain. Its SPF/DKIM DNS records are set in Porkbun. |
+| Real mailbox | **Gmail** | Where the `@soul-pathways.com` address is actually read and answered. |
+| Map tiles | **Jawg Maps** | Token is `NEXT_PUBLIC_JAWG_TOKEN` (public by design, it ships in the site's JavaScript). |
+| Fonts / map library | Google Fonts, Leaflet (unpkg CDN) | Loaded in the browser, nothing to manage. |
+| Dependency updates | **Dependabot** | Patch and minor updates are auto-merged once the build check passes; majors need a manual review. |
+
+### How a change reaches the live site
+
+1. Edit code (a PR) or content (Tina editor, which commits to `main`).
+2. A PR runs `.github/workflows/build-check.yml` (build only, no deploy).
+3. Merging to `main` runs `.github/workflows/deploy.yml`, which builds on Linux and publishes `./out` to GitHub Pages.
+
+### Where the secrets live (names only)
+
+| Name | Where it is set | Used for |
+| --- | --- | --- |
+| `TINA_TOKEN` | GitHub repo → Settings → Secrets and variables → Actions | Building the `/admin` editor |
+| `NEXT_PUBLIC_JAWG_TOKEN` | GitHub Actions secret, and local `.env` | Map tiles |
+| Resend API key / SMTP credentials | Resend dashboard and wherever the email is sent from | Outgoing email |
+| Account logins (Porkbun, GitHub, Tina Cloud, Resend, Gmail) | Password manager | Managing each service |
+
+Keep 2FA on for all of these accounts, and keep the registrar lock on the domain.
+
+### Routine checks
+
+- **Domain renewal:** renews in Porkbun. Check the expiry date and the payment method once a year.
+- **Email not arriving or landing in spam:** check the Resend and Gmail DNS records (MX, SPF, DKIM, DMARC) in Porkbun.
+- **Editor can't save:** check Tina Cloud and that `TINA_TOKEN` is still valid.
+- **Site not updating:** check the latest run of the *Deploy to GitHub Pages* workflow in the repo's Actions tab.
+
 ## Editing content
 
 The client opens `/admin/index.html` on the deployed site, logs in via Tina
